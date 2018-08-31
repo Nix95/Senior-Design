@@ -2,4 +2,5 @@
     <string name="app_name">InPlainSight</string>
     <string name="title_activity_main_game">Map</string>
     <string name="google_maps_key">AIzaSyBfynDX61FaVl2VapJSt7IJfpg0RrkshbY</string>
+    <!--<integer name="google_play_services_version"></integer>-->
 </resources>
