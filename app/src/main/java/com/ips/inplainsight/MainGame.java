@@ -55,7 +55,7 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
         mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
-        
+
     }
 
     /**
