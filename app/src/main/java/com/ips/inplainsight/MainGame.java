@@ -1,5 +1,9 @@
 package com.ips.inplainsight;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.Manifest;
@@ -8,6 +12,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -27,6 +33,11 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+    LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+    LocationListener mlocListener = new LocationListener();
+
+
+        mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +59,27 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+    private Circle circleOuter;
+    private Circle circleInner;
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
-
+        circleInner = mMap.addCircle(new CircleOptions()
+                .center(new LatLng(37.4220, -122.0841))
+                .radius(400) // In meters
+                .strokeWidth(10)
+                .strokeColor(Color.BLACK));
+        circleOuter = mMap.addCircle(new CircleOptions()
+                .center(new LatLng(37.4222, -122.082))
+                .radius(600) // In meters
+                .strokeWidth(10)
+                .strokeColor(Color.BLUE));
+        mMap.getBearing();
     }
 
     /**
