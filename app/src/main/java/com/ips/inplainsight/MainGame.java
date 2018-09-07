@@ -32,87 +32,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, SensorEventListener {
+        GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
 
-    private SensorManager mSensorManager;
-    private final float[] mAccelerometerReading = new float[3];
-    private final float[] mMagnetometerReading = new float[3];
+    // Gravity rotational data
+    private float gravity[];
+    // Magnetic rotational data
+    private float magnetic[]; //for magnetic rotational data
+    private float accels[] = new float[3];
+    private float mags[] = new float[3];
+    private float[] values = new float[3];
 
-    private final float[] mRotationMatrix = new float[9];
-    private final float[] mOrientationAngles = new float[3];
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
-        // You must implement this callback in your code.
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Get updates from the accelerometer and magnetometer at a constant rate.
-        // To make batch operations more efficient and reduce power consumption,
-        // provide support for delaying updates to the application.
-        //
-        // In this example, the sensor reporting delay is small enough such that
-        // the application receives an update before the system checks the sensor
-        // readings again.
-        Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (accelerometer != null) {
-            mSensorManager.registerListener((SensorEventListener) this, accelerometer,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-        }
-        Sensor magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (magneticField != null) {
-            mSensorManager.registerListener((SensorEventListener) this, magneticField,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Don't receive any more updates from either sensor.
-        mSensorManager.unregisterListener((SensorEventListener) this);
-    }
-
-    // Get readings from accelerometer and magnetometer. To simplify calculations,
-    // consider storing these readings as unit vectors.
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            System.arraycopy(event.values, 0, mAccelerometerReading,
-                    0, mAccelerometerReading.length);
-        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            System.arraycopy(event.values, 0, mMagnetometerReading,
-                    0, mMagnetometerReading.length);
-        }
-        updateOrientationAngles();
-    }
-
-    // Compute the three orientation angles based on the most recent readings from
-    // the device's accelerometer and magnetometer.
-    public void updateOrientationAngles() {
-        // Update rotation matrix, which is needed to update orientation angles.
-        SensorManager.getRotationMatrix(mRotationMatrix, null,
-                mAccelerometerReading, mMagnetometerReading);
-
-        // "mRotationMatrix" now has up-to-date information.
-
-        SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
-        int azimut = (int) Math.round(Math.toDegrees(mOrientationAngles[0]));
-        TextView mTextView = findViewById(R.id.DirectionTextView);
-        mTextView.setText("\tAzimuth:   " + azimut);
-        // "mOrientationAngles" now has up-to-date information.
-    }
-
+    // azimuth, pitch and roll
+    private float azimuth;
+    private float pitch;
+    private float roll;
+    SensorManager sManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +61,48 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private SensorEventListener mySensorEventListener = new SensorEventListener() {
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        public void onSensorChanged(SensorEvent event) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    mags = event.values.clone();
+                    break;
+                case Sensor.TYPE_ACCELEROMETER:
+                    accels = event.values.clone();
+                    break;
+            }
+
+            if (mags != null && accels != null) {
+                gravity = new float[9];
+                magnetic = new float[9];
+                SensorManager.getRotationMatrix(gravity, magnetic, accels, mags);
+                float[] outGravity = new float[9];
+                SensorManager.remapCoordinateSystem(gravity, SensorManager.AXIS_X,SensorManager.AXIS_Z, outGravity);
+                SensorManager.getOrientation(outGravity, values);
+
+                azimuth = values[0] * 57.2957795f;
+                pitch =values[1] * 57.2957795f;
+                roll = values[2] * 57.2957795f;
+                mags = null;
+                accels = null;
+                TextView mTextView = findViewById(R.id.DirectionTextView);
+                mTextView.setText("\tAzimuth:   " + azimuth);
+            }
+        }
+    };
 
     /**
      * Manipulates the map once available.
