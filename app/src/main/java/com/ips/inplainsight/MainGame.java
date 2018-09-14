@@ -1,5 +1,6 @@
 package com.ips.inplainsight;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -12,6 +13,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.Manifest;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,6 +27,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -31,8 +40,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, com.google.android.gms.location.LocationListener {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -52,6 +61,19 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
     private float pitch;
     private float roll;
     SensorManager sManager;
+    //LocationManager lm;
+    //Location location;
+    private Circle circleOuter;
+    private Circle circleInner;
+
+    private LocationCallback mLocationCallback;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    //GoogleApiClient gac;
+    LocationRequest locationRequest;
+    LocationCallback locationCallback;
+    private long UPDATE_INTERVAL = 2 * 1000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +84,46 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult){
+                if(locationResult == null){
+                    return;
+                }
+                for(Location location : locationResult.getLocations()){
+                    //Update UI
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    TextView llTextView = findViewById(R.id.LatLongTextView);
+                    llTextView.setText("   lat:   " + latitude + "   long:   " + longitude);
+                }
+            }
+        };
+
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+
+        }
+    }
+
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
         super.onResume();
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+        mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
     }
 
     private SensorEventListener mySensorEventListener = new SensorEventListener() {
@@ -114,22 +169,20 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
      * installed Google Play services and returned to the app.
      */
 
-    private Circle circleOuter;
-    private Circle circleInner;
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
+        //TODO: Math and bounbs check
         circleInner = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(37.4220, -122.0841))
+                .center(new LatLng(29.663350, -82.378250))
                 .radius(400) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLACK));
         circleOuter = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(37.4222, -122.082))
+                .center(new LatLng(29.663350, -82.378250))
                 .radius(600) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
@@ -198,3 +251,4 @@ public class MainGame extends FragmentActivity implements GoogleMap.OnMyLocation
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
 }
+
