@@ -97,7 +97,26 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
                     TextView llTextView = findViewById(R.id.LatLongTextView);
-                    llTextView.setText("   lat:   " + latitude + "   long:   " + longitude);
+                    llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
+
+                    //in bounds
+
+                    double latdif = location. getLatitude() - circleInner.getCenter().latitude;
+                    double longdif =  location.getLongitude() - circleInner.getCenter().longitude;
+                    double latdifout =  location.getLatitude() - circleOuter.getCenter().latitude;
+                    double longdifout =  location.getLongitude() - circleOuter.getCenter().longitude;
+                    if(distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()){
+                        //player out of outer bounds, DQ
+                        llTextView.setTextColor(Color.parseColor("#ff0000"));
+                    }
+                    else if(distance(location.getLatitude(), circleInner.getCenter().latitude, location.getLongitude(), circleInner.getCenter().longitude) > circleInner.getRadius()){
+                        //Player out of inner bounds, gets damage
+                        llTextView.setTextColor(Color.parseColor("#0000ff"));
+                    }
+                    else{
+                        //reset view changes
+                        llTextView.setTextColor(Color.parseColor("#000000"));
+                    }
                 }
             }
         };
@@ -249,6 +268,24 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
+    }
+
+    public static double distance(double lat1, double lat2, double lon1,
+                                  double lon2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        distance = Math.pow(distance, 2);
+
+        return Math.sqrt(distance);
     }
 }
 
