@@ -101,7 +101,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
                     //in bounds
 
-                    double latdif = location. getLatitude() - circleInner.getCenter().latitude;
+                    double latdif = location.getLatitude() - circleInner.getCenter().latitude;
                     double longdif =  location.getLongitude() - circleInner.getCenter().longitude;
                     double latdifout =  location.getLatitude() - circleOuter.getCenter().latitude;
                     double longdifout =  location.getLongitude() - circleOuter.getCenter().longitude;
