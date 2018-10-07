@@ -160,44 +160,47 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         h.postDelayed( runnable = new Runnable() {
             public void run() {
                 double shrink = 0.85;
+                double Rad = 6378137;
                 double shrinkInv = 1 - shrink;
                 double tempOuterRad = circleInner.getRadius();
                 double tempInnerRad = circleInner.getRadius() * shrink;
 
                 Random random = new Random();
-                double a = circleOuter.getCenter().longitude;
-                double b = circleOuter.getCenter().latitude;
-                double r = circleOuter.getRadius() * shrinkInv;//maybe
+                double a = circleInner.getCenter().longitude;
+                double b = circleInner.getCenter().latitude;
+                double r = circleInner.getRadius() * shrink;
+                double rlat = (r/Rad);
+                double rlong = (r/(Rad*Math.cos(Math.PI * b/180)));
 
-                //double xMin = a - r;
-                //double xMax = a + r;
-                //double xRange = xMax - xMin;
-                //double x = xMin + random.nextDouble() * xRange;
+                double xMin = a - rlong;
+                double xMax = a + rlong;
+                double xRange = xMax - xMin;
+                double x = xMin + random.nextDouble() * xRange;
 
-                //double yDelta = Math.sqrt(Math.pow(r,  2) - Math.pow((x - a), 2));
-                //double yMax = b + yDelta;
-                //double yMin = b - yDelta;
-                //double yRange = yMax - yMin;
-                //double y = yMin + (random.nextDouble() * yRange);
+                double yDelta = Math.sqrt(Math.pow(rlat,  2) - Math.pow((x - a), 2));
+                double yMax = b + rlat;
+                double yMin = b - rlat;
+                double yRange = yMax - yMin;
+                double y = yMin + random.nextDouble() * yRange;
 
-                double    y0 = b
-                        , x0 = a
-                        , u = Math.random()
-                        , v = Math.random()
-                        , w = r * Math.sqrt(u)
-                        , t = 2 * Math.PI * v
-                        , x = w * Math.cos(t)
-                        , y1 = w * Math.sin(t)
-                        , x1 = x / Math.cos(y0);
+//                double    y0 = b
+//                        , x0 = a
+//                        , u = Math.random()
+//                        , v = Math.random()
+//                        , w = r * Math.sqrt(u)
+//                        , t = 2 * Math.PI * v
+//                        , x = w * Math.cos(t)
+//                        , y1 = w * Math.sin(t)
+//                        , x1 = x / Math.cos(y0);
 
-                double newY = y0 + y1;
-                double newX = x0 + x1;
+//                double newY = y0 + y1;
+//                double newX = x0 + x1;
 
                 circleInner.setRadius(tempInnerRad);
                 circleOuter.setRadius(tempOuterRad);
-                //ircleOuter.setCenter(circleInner.getCenter());
-                LatLng newInner = new LatLng(newX,newY);
-                //circleInner.setCenter(newInner);
+                circleOuter.setCenter(circleInner.getCenter());
+                LatLng newInner = new LatLng(x,y);
+                circleInner.setCenter(newInner);
 
                 h.postDelayed(runnable, delay);
             }
