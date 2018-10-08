@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.Manifest;
@@ -39,6 +40,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Random;
 
 public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, com.google.android.gms.location.LocationListener {
@@ -74,6 +77,17 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     LocationCallback locationCallback;
     private long UPDATE_INTERVAL = 2 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
+
+    Handler h = new Handler();
+    int delay = 10000; //milliseconds
+    Runnable runnable;
+
+
+    //@Override
+    //public void onPause() {
+      //  super.onPause();
+       // timerHandler.removeCallbacks(timerRunnable);
+    //}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +157,54 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
+        h.postDelayed( runnable = new Runnable() {
+            public void run() {
+                double shrink = 0.85;
+                double Rad = 6378137;
+                double shrinkInv = 1 - shrink;
+                double tempOuterRad = circleInner.getRadius();
+                double tempInnerRad = circleInner.getRadius() * shrink;
+
+                Random random = new Random();
+                double a = circleInner.getCenter().longitude;
+                double b = circleInner.getCenter().latitude;
+                double r = circleInner.getRadius() * shrink;
+                double rlat = (r/Rad);
+                double rlong = (r/(Rad*Math.cos(Math.PI * b/180)));
+
+                double xMin = a - rlong;
+                double xMax = a + rlong;
+                double xRange = xMax - xMin;
+                double x = xMin + random.nextDouble() * xRange;
+
+                double yDelta = Math.sqrt(Math.pow(rlat,  2) - Math.pow((x - a), 2));
+                double yMax = b + rlat;
+                double yMin = b - rlat;
+                double yRange = yMax - yMin;
+                double y = yMin + random.nextDouble() * yRange;
+
+//                double    y0 = b
+//                        , x0 = a
+//                        , u = Math.random()
+//                        , v = Math.random()
+//                        , w = r * Math.sqrt(u)
+//                        , t = 2 * Math.PI * v
+//                        , x = w * Math.cos(t)
+//                        , y1 = w * Math.sin(t)
+//                        , x1 = x / Math.cos(y0);
+
+//                double newY = y0 + y1;
+//                double newX = x0 + x1;
+
+                circleInner.setRadius(tempInnerRad);
+                circleOuter.setRadius(tempOuterRad);
+                circleOuter.setCenter(circleInner.getCenter());
+                LatLng newInner = new LatLng(x,y);
+                circleInner.setCenter(newInner);
+
+                h.postDelayed(runnable, delay);
+            }
+        }, delay);
     }
 
     private SensorEventListener mySensorEventListener = new SensorEventListener() {
@@ -197,12 +259,12 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //TODO: Math and bounbs check
         circleInner = mMap.addCircle(new CircleOptions()
                 .center(new LatLng(29.663350, -82.378250))
-                .radius(400) // In meters
+                .radius(700) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLACK));
         circleOuter = mMap.addCircle(new CircleOptions()
                 .center(new LatLng(29.663350, -82.378250))
-                .radius(600) // In meters
+                .radius(1000) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
     }
