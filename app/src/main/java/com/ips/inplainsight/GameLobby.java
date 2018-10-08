@@ -24,11 +24,20 @@ public class GameLobby extends AppCompatActivity {
 
 
     private ArrayList<String> data = new ArrayList<String>();
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_lobby);
+        button = (Button) findViewById(R.id.list_item_btn);
+        button.setOnClickListener(new View.onClickListener() {
+            @Override
+            public void onClick(View v) {
+                openMainGame();
+            }
+        });
+
         ListView lv = (ListView) findViewById(R.id.listview);
         generateListContent();
         lv.setAdapter(new MyListAdapter(this, R.layout.list_item, data));
@@ -38,6 +47,11 @@ public class GameLobby extends AppCompatActivity {
                 Toast.makeText(GameLobby.this, "List item was clicked at " + position, Toast.LENGTH_SHORT).show();
             }
         });*/
+    }
+
+    public void openMainGame(){
+        Intent intent = new Intent(GameLobby.this, MainGame.class);
+        startActivity(intent);
     }
 
     private void generateListContent() {
