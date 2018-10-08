@@ -6,6 +6,7 @@ import android.Manifest;
 public class PlayerClass {
     public static String userName;
     private PlayerClass target;
+    private PlayerClass assassin;
     private Location curLoc;
     private boolean inInnerBounds;
     private boolean inOuterBounds;
@@ -18,7 +19,13 @@ public class PlayerClass {
     public void setTarget(PlayerClass target) {
         this.target = target;
     }
+    public PlayerClass getAssassin() {
+        return assassin;
+    }
 
+    public void setAssassin(PlayerClass assassin) {
+        this.assassin = assassin;
+    }
     public Location getCurLoc() {
         return curLoc;
     }

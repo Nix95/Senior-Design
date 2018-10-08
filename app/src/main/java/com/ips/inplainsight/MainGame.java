@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,6 +40,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +53,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+
+    private static final String TAG = "MainGame";
 
     // Gravity rotational data
     private float gravity[];
@@ -68,6 +73,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     //Location location;
     private Circle circleOuter;
     private Circle circleInner;
+    private Circle dummyPlayer;
 
     private LocationCallback mLocationCallback;
 
@@ -79,7 +85,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     Handler h = new Handler();
-    int delay = 10000; //milliseconds
+    int delay = 3000; //milliseconds
     Runnable runnable;
 
 
@@ -115,10 +121,6 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
                     //in bounds
 
-                    double latdif = location.getLatitude() - circleInner.getCenter().latitude;
-                    double longdif =  location.getLongitude() - circleInner.getCenter().longitude;
-                    double latdifout =  location.getLatitude() - circleOuter.getCenter().latitude;
-                    double longdifout =  location.getLongitude() - circleOuter.getCenter().longitude;
                     if(distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()){
                         //player out of outer bounds, DQ
                         llTextView.setTextColor(Color.parseColor("#ff0000"));
@@ -130,6 +132,22 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     else{
                         //reset view changes
                         llTextView.setTextColor(Color.parseColor("#000000"));
+                    }
+
+                    //Dummy player hot cold TODO replace with target
+                    TextView mTextView = findViewById(R.id.DirectionTextView);
+                    if(distance(location.getLatitude(), dummyPlayer.getCenter().latitude, location.getLongitude(), dummyPlayer.getCenter().longitude) > 50){
+                        //player out of outer bounds, DQ
+                        mTextView.setTextColor(Color.parseColor("#0000ff"));
+                    }
+                    else if(distance(location.getLatitude(), dummyPlayer.getCenter().latitude, location.getLongitude(), dummyPlayer.getCenter().longitude) < 50 &&
+                            distance(location.getLatitude(), dummyPlayer.getCenter().latitude, location.getLongitude(), dummyPlayer.getCenter().longitude) > 25){
+                        //Player out of inner bounds, gets damage
+                        mTextView.setTextColor(Color.parseColor("#ffa500"));
+                    }
+                    else{
+                        //reset view changes
+                        mTextView.setTextColor(Color.parseColor("#ff0000"));
                     }
                 }
             }
@@ -159,7 +177,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
         h.postDelayed( runnable = new Runnable() {
             public void run() {
-                double shrink = 0.85;
+                double shrink = 0.7;
                 double Rad = 6378137;
                 double shrinkInv = 1 - shrink;
                 double tempOuterRad = circleInner.getRadius();
@@ -168,39 +186,29 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 Random random = new Random();
                 double a = circleInner.getCenter().longitude;
                 double b = circleInner.getCenter().latitude;
-                double r = circleInner.getRadius() * shrink;
-                double rlat = (r/Rad);
-                double rlong = (r/(Rad*Math.cos(Math.PI * b/180)));
-
-                double xMin = a - rlong;
-                double xMax = a + rlong;
-                double xRange = xMax - xMin;
-                double x = xMin + random.nextDouble() * xRange;
-
-                double yDelta = Math.sqrt(Math.pow(rlat,  2) - Math.pow((x - a), 2));
-                double yMax = b + rlat;
-                double yMin = b - rlat;
-                double yRange = yMax - yMin;
-                double y = yMin + random.nextDouble() * yRange;
-
-//                double    y0 = b
-//                        , x0 = a
-//                        , u = Math.random()
-//                        , v = Math.random()
-//                        , w = r * Math.sqrt(u)
-//                        , t = 2 * Math.PI * v
-//                        , x = w * Math.cos(t)
-//                        , y1 = w * Math.sin(t)
-//                        , x1 = x / Math.cos(y0);
-
-//                double newY = y0 + y1;
-//                double newX = x0 + x1;
+                double r = circleInner.getRadius() * shrinkInv;
+//                double rlat = (r/Rad);
+//                double rlong = (r/(Rad*Math.cos(Math.PI * b/180)));
+//
+//
+//
+//                double xMin = a - rlong;
+//                double xMax = a + rlong;
+//                double xRange = xMax - xMin;
+//                double x = xMin + random.nextDouble() * xRange;
+//
+//                double yDelta = Math.sqrt(Math.pow(rlat,  2) - Math.pow((x - a), 2));
+//                double yMax = b + rlat;
+//                double yMin = b - rlat;
+//                double yRange = yMax - yMin;
+//                double y = yMin + random.nextDouble() * yRange;
 
                 circleInner.setRadius(tempInnerRad);
                 circleOuter.setRadius(tempOuterRad);
                 circleOuter.setCenter(circleInner.getCenter());
-                LatLng newInner = new LatLng(x,y);
-                circleInner.setCenter(newInner);
+                //LatLng newInner = new LatLng(y,x);
+                circleInner.setCenter(computeOffset(circleInner.getCenter(), r, azimuth));
+                //Log.d(TAG, x + " " + y);
 
                 h.postDelayed(runnable, delay);
             }
@@ -267,6 +275,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 .radius(1000) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
+        dummyPlayer = mMap.addCircle(new CircleOptions()
+                .center(new LatLng(29.6633, -82.3782))
+                .radius(5) // In meters
+                .strokeWidth(25)
+                .strokeColor(Color.RED));
     }
 
     /**
@@ -348,6 +361,22 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         distance = Math.pow(distance, 2);
 
         return Math.sqrt(distance);
+    }
+
+    public static LatLng computeOffset(LatLng from, double distance, double heading) {
+        Random random = new Random();
+        double pn = Math.round(Math.random()) * 2 - 1;
+        distance /= 6371009.0D;  //earth_radius = 6371009 # in meters
+        heading = Math.toRadians(heading);
+        double fromLat = Math.toRadians(from.latitude);
+        double fromLng = Math.toRadians(from.longitude);
+        double cosDistance = Math.cos(distance*random.nextDouble()*pn);// * random.nextDouble();
+        double sinDistance = Math.sin(distance*random.nextDouble()*pn);// * random.nextDouble();
+        double sinFromLat = Math.sin(fromLat);
+        double cosFromLat = Math.cos(fromLat);
+        double sinLat = cosDistance * sinFromLat + sinDistance * cosFromLat * Math.cos(heading);
+        double dLng = Math.atan2(sinDistance * cosFromLat * Math.sin(heading), cosDistance - sinFromLat * sinLat);
+        return new LatLng(Math.toDegrees(Math.asin(sinLat)), Math.toDegrees(fromLng + dLng));
     }
 }
 
