@@ -3,9 +3,7 @@ package com.ips.inplainsight;
 import android.app.Activity;
 import android.os.Bundle;
 
-/**
- * Reference AbhiAndroid
- */
+
 
 public class SecondSplash extends Activity {
 
@@ -15,3 +13,7 @@ public class SecondSplash extends Activity {
         setContentView(R.layout.activity_splash_screen);
     }
 }
+
+/*
+MAY NOT NEED THIS FILE
+ */
