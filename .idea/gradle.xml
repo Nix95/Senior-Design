@@ -9,6 +9,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/auth" />
+            <option value="$PROJECT_DIR$/auth/app" />
+            <option value="$PROJECT_DIR$/internal" />
+            <option value="$PROJECT_DIR$/internal/chooser" />
+            <option value="$PROJECT_DIR$/internal/lint" />
+            <option value="$PROJECT_DIR$/internal/lintchecks" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
