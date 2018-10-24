@@ -1,8 +1,10 @@
 package com.ips.inplainsight;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Game {
+public class Game  {
     public String gameId;
     private PlayerClass[] players = new PlayerClass[12];
     private Location seedLoc;
