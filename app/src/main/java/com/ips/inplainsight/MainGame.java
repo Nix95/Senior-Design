@@ -56,7 +56,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     long diff;
     Intent intent;
     int intentChange = 0;
-    PlayerClass curPlayer, targetPlayer;
+    PlayerClass curPlayer = new PlayerClass();
+    PlayerClass targetPlayer = new PlayerClass();
+
+    Game curGame = new Game();
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -213,35 +216,14 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         h.postDelayed( runnable = new Runnable() {
             public void run() {
                 double shrink = 0.7;
-                double Rad = 6378137;
                 double shrinkInv = 1 - shrink;
                 double tempOuterRad = circleInner.getRadius();
                 double tempInnerRad = circleInner.getRadius() * shrink;
 
-                Random random = new Random();
-                double a = circleInner.getCenter().longitude;
-                double b = circleInner.getCenter().latitude;
                 double r = circleInner.getRadius() * shrinkInv;
-//                double rlat = (r/Rad);
-//                double rlong = (r/(Rad*Math.cos(Math.PI * b/180)));
-//
-//
-//
-//                double xMin = a - rlong;
-//                double xMax = a + rlong;
-//                double xRange = xMax - xMin;
-//                double x = xMin + random.nextDouble() * xRange;
-//
-//                double yDelta = Math.sqrt(Math.pow(rlat,  2) - Math.pow((x - a), 2));
-//                double yMax = b + rlat;
-//                double yMin = b - rlat;
-//                double yRange = yMax - yMin;
-//                double y = yMin + random.nextDouble() * yRange;
-
                 circleInner.setRadius(tempInnerRad);
                 circleOuter.setRadius(tempOuterRad);
                 circleOuter.setCenter(circleInner.getCenter());
-                //LatLng newInner = new LatLng(y,x);
                 circleInner.setCenter(computeOffset(circleInner.getCenter(), r, azimuth));
                 //Log.d(TAG, x + " " + y);
 
@@ -299,22 +281,20 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
-        //TODO: Math and bounbs check
+
+        curGame.setSeedLoc(new LatLng(29.663350, -82.378250));
+
         circleInner = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(29.663350, -82.378250))
+                .center(curGame.getSeedLoc())
                 .radius(700) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLACK));
         circleOuter = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(29.663350, -82.378250))
+                .center(curGame.getSeedLoc())
                 .radius(1000) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
-//        dummyPlayer = mMap.addCircle(new CircleOptions()
-//                .center(new LatLng(29.6633, -82.3782))
-//                .radius(6) // In meters
-//                .strokeWidth(25)
-//                .strokeColor(Color.RED));
+
         targetPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
     }
 
