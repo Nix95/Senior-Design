@@ -1,3 +1,4 @@
+/* May not use*/
 package com.ips.inplainsight;
 
 import android.app.Activity;
