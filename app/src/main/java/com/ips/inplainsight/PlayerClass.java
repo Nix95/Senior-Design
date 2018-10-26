@@ -2,11 +2,17 @@ package com.ips.inplainsight;
 import android.location.Location;
 import android.os.Bundle;
 import android.Manifest;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class PlayerClass {
     public static String userName;
+    public long reactTime;
     private PlayerClass target;
-    private Location curLoc;
+    private PlayerClass assassin;
+    private LatLng curLoc;
     private boolean inInnerBounds;
     private boolean inOuterBounds;
     //Power-Ups
@@ -18,12 +24,18 @@ public class PlayerClass {
     public void setTarget(PlayerClass target) {
         this.target = target;
     }
+    public PlayerClass getAssassin() {
+        return assassin;
+    }
 
-    public Location getCurLoc() {
+    public void setAssassin(PlayerClass assassin) {
+        this.assassin = assassin;
+    }
+    public LatLng getCurLoc() {
         return curLoc;
     }
 
-    public void setCurLoc(Location curLoc) {
+    public void setCurLoc(LatLng curLoc) {
         this.curLoc = curLoc;
     }
 

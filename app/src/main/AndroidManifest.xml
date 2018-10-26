@@ -55,10 +55,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SecondSplash" />
-        <activity android:name=".GameLobby" />
         <activity android:name=".MainGame" />
         <activity android:name=".Lobby"></activity>
+        <activity android:name=".MiniGameActivity"></activity>
     </application>
 
 </manifest>
