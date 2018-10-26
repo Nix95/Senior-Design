@@ -33,15 +33,30 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!--
         <activity
             android:name=".MainGame"
-            android:label="@string/title_activity_main_game">
+            android:label="@string/title_activity_main_game" />
+        <activity android:name=".GameLobby">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        -->
+
+        <activity
+            android:name=".SplashScreen"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainGame" />
+        <activity android:name=".Lobby"></activity>
         <activity android:name=".MiniGameActivity"></activity>
     </application>
 
