@@ -9,10 +9,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class PlayerClass {
     public static String userName;
-    public long reactTime;
+    public long reactTime =  5000;
     private PlayerClass target;
     private PlayerClass assassin;
-    private LatLng curLoc;
+    private LatLng curLoc; //TODO update "my location" in game
     private boolean inInnerBounds;
     private boolean inOuterBounds;
     //Power-Ups
