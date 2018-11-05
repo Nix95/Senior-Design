@@ -235,7 +235,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             //TODO THIS LINE BELOW IS WHAT MOVES TO LOBBY
-            //startActivity(new Intent(Login.this, Lobby.class));
+//            startActivity(new Intent(Login.this, Lobby.class));
             findViewById(R.id.disconnect_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
 
