@@ -1,5 +1,6 @@
 package com.ips.inplainsight;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,16 +37,16 @@ public class Login extends AppCompatActivity{
     private GoogleSignInClient mGoogleSignInClient;
     View v;
     SignInButton signInButton;
-
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         Log.d(TAG, "Made it to onCreate");
         v = findViewById(R.id.sign_in_button);
-//        signInButton = (SignInButton)findViewById(R.id.sign_in_button);
         setContentView(R.layout.activity_login);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                //.requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
@@ -54,8 +59,8 @@ public class Login extends AppCompatActivity{
         Log.d(TAG, "I made it to onStart");
     // Check for existing Google Sign In account, if the user is already signed in
     // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
 
 //        v = findViewById(R.id.sign_in_button);
         signInButton = (SignInButton)findViewById(R.id.sign_in_button);
@@ -95,44 +100,90 @@ public class Login extends AppCompatActivity{
     }
 
     // [START auth_fui_result]
+    // THIS IS GOOGLE SIGN IN ONACTIVITY RESULT, NOT FIREBASE
+    //   @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        Log.d(TAG, "Made it to onActvitiyResult");
+//        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+//        if (requestCode == RC_SIGN_IN) {
+//            // The Task returned from this call is always completed, no need to attach
+//            // a listener.
+//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+//            handleSignInResult(task);
+//        }
+//    }
+                // THIS IS FIREBASE SIGN IN ONACTIVITYRESULT
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "Made it to onActvitiyResult");
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
+                // ...
+            }
         }
     }
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        Log.d(TAG, "Made it to HandleSigninresult");
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
-        }
-    }
-    // [END auth_fui_result]
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                           // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
 
-    public void signOut() {
-        // [START auth_fui_signout]
-        AuthUI.getInstance()
-                .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    public void onComplete(@NonNull Task<Void> task) {
                         // ...
                     }
                 });
-        // [END auth_fui_signout]
+    }
+//    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+//        Log.d(TAG, "Made it to HandleSigninresult");
+//        try {
+//            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+//
+//            // Signed in successfully, show authenticated UI.
+//            updateUI(account);
+//        } catch (ApiException e) {
+//            // The ApiException status code indicates the detailed failure reason.
+//            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+//            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+//            updateUI(null);
+//        }
+//    }
+    // [END auth_fui_result]
+
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
     }
 
     public void delete() {
@@ -148,21 +199,8 @@ public class Login extends AppCompatActivity{
         // [END auth_fui_delete]
     }
 
-    public void themeAndLogo() {
-        List<AuthUI.IdpConfig> providers = Collections.emptyList();
-
-        // [START auth_fui_theme_logo]
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-//                        .setLogo(R.drawable.my_great_logo)      // Set logo drawable
-//                        .setTheme(R.style.MySuperAppTheme)      // Set theme
-                        .build(),
-                RC_SIGN_IN);
-        // [END auth_fui_theme_logo]
-    }
-    private void updateUI(GoogleSignInAccount user) {
+    @SuppressLint("StringFormatInvalid")
+    private void updateUI(FirebaseUser user) {
 //        hideProgressDialog();
         TextView mStatusTextView = findViewById(R.id.mStatus);
         TextView mDetailTextView = findViewById(R.id.mDetail);
@@ -170,11 +208,11 @@ public class Login extends AppCompatActivity{
         if (user != null) {
 
 
-//            mStatusTextView.setText(getString(R.string.google_status_fmt, user.getEmail()));
-            mStatusTextView.setText("Hey there Delilah");
+            mStatusTextView.setText(getString(R.string.google_status_fmt, user.getEmail()));
+            //mStatusTextView.setText("Hey there Delilah");
             Log.d(TAG, "User IS Found");
 
-            //mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
+            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
 //
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
