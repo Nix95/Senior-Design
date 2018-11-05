@@ -2,20 +2,44 @@ package com.ips.inplainsight;
 import android.location.Location;
 import android.os.Bundle;
 import android.Manifest;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
 public class PlayerClass {
+    public static String uID;
+    public boolean eog = false;
     public static String userName;
     public long reactTime =  5000;
+    private boolean canAD = true;
     private PlayerClass target;
     private PlayerClass assassin;
     private LatLng curLoc; //TODO update "my location" in game
     private boolean inInnerBounds;
     private boolean inOuterBounds;
     //Power-Ups
+
+    private static final String TAG = "PlayerClass";
+
+    public boolean getCanAD() {
+        return canAD;
+    }
+
+    public void setCanAD_False() {
+        canAD = false;
+        Log.d(TAG, canAD + " : set to false");
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                canAD = true;
+                Log.d(TAG, canAD + " : time up state change");
+            }
+            }, 120000);
+    }
 
     public PlayerClass getTarget() {
         return target;

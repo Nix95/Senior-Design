@@ -15,6 +15,8 @@ public class Game  {
     public int durationSeconds;
     private int playersRemaining = 0;
 
+    private static final String TAG = "GameClass";
+
     public LinkedList<PlayerClass> getPlayers() {
         return players;
     }

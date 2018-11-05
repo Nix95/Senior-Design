@@ -190,11 +190,19 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                         }
                             intent = new Intent(MainGame.this, MiniGameActivity.class);
 
-                            if(intentChange == 0) {
+                        if(AoD==0 && intentChange==0) { //Atacking, elim other or refresh if lose
+                            if (curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
                                 //Log.d(TAG, intentChange + " : Swithcing intent");
                                 intentChange = 1;
                                 startActivityForResult(intent, 1);
                             }
+                        }
+                        else if(AoD==1 && intentChange==0) { //Defending, get away if win eliminate if lose
+                            if (curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
+                                intentChange = 1;
+                                startActivityForResult(intent, 1);
+                            }
+                        }
                     }
                 }
             }
@@ -208,8 +216,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-
-        Handler h = new Handler();
+        long d = 5000;
+        final Handler h = new Handler();
 
         switch(requestCode){
             case 1:
@@ -221,27 +229,49 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     @Override
                     public void run() {
                         if(AoD==0){ //Atacking, elim other or refresh if lose
-                            if(diff<curPlayer.getTarget().reactTime){
-                                curGame.eliminatePlayer(curPlayer.getTarget());
-                                Log.d(TAG, "Taking out target. Pr: " + curGame.getPlayersRemaining());
-                                curPlayer.reactTime = 5000; //reset your reaction time 
-                                //TODO won screen
-                            }
-                            else{
-                                //TODO refresh
+                            if(curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
+                                if (diff < curPlayer.getTarget().reactTime) {
+                                    Log.d(TAG, "Taking out target. Pr: " + curGame.getPlayersRemaining());
+                                    curPlayer.reactTime = 5000; //reset your reaction time
+                                    Log.d(TAG, curGame.getPlayersRemaining() + " : Players remaining");
+                                    if(curGame.getPlayersRemaining()<=2){ //win/lose
+                                        Toast.makeText(getApplication().getApplicationContext(), "YOU WON!", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "WIN");
+                                        //TODO go to lobby
+                                    }
+                                    curGame.eliminatePlayer(curPlayer.getTarget());
+                                    Toast.makeText(getApplication().getApplicationContext(), "Target eliminated!", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getApplication().getApplicationContext(), "Target escaped!\nWait two minutes to attack.", Toast.LENGTH_LONG).show();
+                                    //possibly new handler and run to a refresh screen
+                                    Log.d(TAG, " : they defended");
+                                    curPlayer.setCanAD_False();
+                                    curPlayer.getTarget().setCanAD_False();
+                                }
                             }
                         }
                         else if(AoD==1){ //Defending, get away if win eliminate if lose
-                            if(diff<curPlayer.getAssassin().reactTime){//
-                                //refresh
-                            }
-                            else{
-                                //TODO lose screen
-                                curGame.eliminatePlayer(curPlayer);
+                            if(curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
+                                if (diff < curPlayer.getAssassin().reactTime) {//
+                                    //refresh
+                                    Toast.makeText(getApplication().getApplicationContext(), "You Escaped!\nYou have two minutes to get away.", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, " : you defended");
+                                    curPlayer.setCanAD_False();
+                                    curPlayer.getAssassin().setCanAD_False();
+                                } else {
+                                    //TODO go to lobby possible splash screen.
+                                    if(curGame.getPlayersRemaining()<=2){//win/lose
+                                        Toast.makeText(getApplication().getApplicationContext(), "YOU LOSE!", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, " : LOSE");
+                                        //TODO go to lobby
+                                    }
+                                    Toast.makeText(getApplication().getApplicationContext(), "You were eliminated!", Toast.LENGTH_LONG).show();
+                                    curGame.eliminatePlayer(curPlayer);
+                                }
                             }
                         }
                     }
-                }, 5000); //ensures the other time is gotten or default lose after 5 second.
+                }, d); //ensures the other time is gotten or default lose after 5 second. Maybe have this be the refresh
 
                 break;
         }
