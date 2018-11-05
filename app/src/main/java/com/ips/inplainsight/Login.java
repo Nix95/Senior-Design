@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Login extends AppCompatActivity{
+public class Login extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "LoginActivityOccuring";
     private static final int RC_SIGN_IN = 123;
     private GoogleSignInClient mGoogleSignInClient;
@@ -43,8 +43,14 @@ public class Login extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         Log.d(TAG, "Made it to onCreate");
-        v = findViewById(R.id.sign_in_button);
+        //v = findViewById(R.id.sign_in_button);
+
         setContentView(R.layout.activity_login);
+
+        //BUTTON LISTENERS
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.disconnect_button).setOnClickListener(this);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -66,13 +72,14 @@ public class Login extends AppCompatActivity{
         signInButton = (SignInButton)findViewById(R.id.sign_in_button);
 
         Log.d(TAG, "Cameback from updateUI & initalized v");
-        signInButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v)
-            {
-                signIn();
-            }
-        });
+//        signInButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v)
+//            {
+//                signIn();
+//            }
+//        });
+
     }
     private void signIn() {
         Log.d(TAG, "Made it to SignIn");
@@ -172,6 +179,21 @@ public class Login extends AppCompatActivity{
 //    }
     // [END auth_fui_result]
 
+
+    private void revokeAccess() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google revoke access
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
+    }
+
     private void signOut() {
         // Firebase sign out
         mAuth.signOut();
@@ -209,22 +231,21 @@ public class Login extends AppCompatActivity{
 
 
             mStatusTextView.setText(getString(R.string.google_status_fmt, user.getEmail()));
-            //mStatusTextView.setText("Hey there Delilah");
             Log.d(TAG, "User IS Found");
-
             mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
-
-//
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            //TODO
-            //THIS IS WHERE WE WOULD REDIRECT TO LOBBY IF ALREADY SIGNED IN
-//            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            //TODO THIS LINE BELOW IS WHAT MOVES TO LOBBY
+            //startActivity(new Intent(Login.this, Lobby.class));
+            findViewById(R.id.disconnect_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+
         } else {
-//            mStatusTextView.setText(R.string.signed_out);
-//            mDetailTextView.setText(null);
+            mStatusTextView.setText(null);
+            mDetailTextView.setText(null);
             Log.d(TAG, "User NOT Found");
-//            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-//            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.disconnect_button).setVisibility(View.GONE);
+            findViewById(R.id.sign_out_button).setVisibility(View.GONE);
         }
     }
 
@@ -242,4 +263,15 @@ public class Login extends AppCompatActivity{
 //                RC_SIGN_IN);
 //        // [END auth_fui_pp_tos]
 //    }
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.sign_in_button) {
+            signIn();
+        } else if (i == R.id.sign_out_button) {
+            signOut();
+        } else if (i == R.id.disconnect_button) {
+        revokeAccess();
+    }
+    }
 }

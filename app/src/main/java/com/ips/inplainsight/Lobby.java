@@ -14,9 +14,10 @@ public class Lobby extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
+    private static final String TAG = "LobbyActivityOccuring";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "Made it to LobbyActivity On Create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
