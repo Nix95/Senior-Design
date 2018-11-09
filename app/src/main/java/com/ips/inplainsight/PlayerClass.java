@@ -17,6 +17,14 @@ public class PlayerClass {
     private boolean inOuterBounds;
     //Power-Ups
 
+    public PlayerClass() {
+
+    }
+
+    public PlayerClass(String userName) {
+        this.userName = userName;
+    }
+
     public PlayerClass getTarget() {
         return target;
     }

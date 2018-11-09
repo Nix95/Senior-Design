@@ -12,7 +12,7 @@ public class Game  {
     public String gameId;
     private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
     private LatLng seedLoc;
-    public int durationSeconds;
+    //public int durationSeconds;
     private int playersRemaining = players.size();
 
     public LinkedList<PlayerClass> getPlayers() {
@@ -50,7 +50,7 @@ public class Game  {
                 this.players.remove(player);
             }
             else if(this.players.getLast()==player){ //last player
-                this.players.peekFirst().setAssassin(this.players.get(this.players.size()-2)); //second to last player asaasinating first
+                this.players.peekFirst().setAssassin(this.players.get(this.players.size()-2)); //second to last player assassinating first
                 this.players.get(this.players.size()-2).setTarget(this.players.peekFirst());//first targeting new last
                 this.players.remove(player);
             }
@@ -63,6 +63,17 @@ public class Game  {
         }
         this.players.remove(player);
     }
+
+    public Game(String gameId, LatLng seedLoc) {
+        this.gameId = gameId;
+        //this.players = players;
+        this.seedLoc = seedLoc;
+        //this.playersRemaining = playersRemaining;
+    }
+
+    public Game() {
+    }
+
 
     public LatLng getSeedLoc() {
         return seedLoc;
@@ -80,3 +91,4 @@ public class Game  {
         this.playersRemaining = playersRemaining;
     }
 }
+
