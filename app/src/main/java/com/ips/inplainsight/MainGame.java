@@ -128,7 +128,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mTextView = findViewById(R.id.DirectionTextView);
         llTextView = findViewById(R.id.LatLongTextView);
 
-        //lobby = new Intent(this, Lobby.class);
+        lobby = new Intent(this, Lobby.class);
 
         //temp objects
         asPlayer.userName = "asPlayer";
@@ -242,7 +242,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                         Toast.makeText(getApplication().getApplicationContext(), "YOU WON!", Toast.LENGTH_LONG).show();
                                         Log.d(TAG, "WIN");
                                         //TODO go to lobby
-                                        //startActivity(lobby);
+                                        startActivity(lobby);
                                     }
                                     curGame.eliminatePlayer(curPlayer.getTarget());
                                     Toast.makeText(getApplication().getApplicationContext(), "Target eliminated!", Toast.LENGTH_LONG).show();
@@ -269,7 +269,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                         Toast.makeText(getApplication().getApplicationContext(), "YOU LOSE!", Toast.LENGTH_LONG).show();
                                         Log.d(TAG, " : LOSE");
                                         //TODO go to lobby
-                                        //startActivity(lobby);
+                                        startActivity(lobby);
                                     }
                                     Toast.makeText(getApplication().getApplicationContext(), "You were eliminated!", Toast.LENGTH_LONG).show();
                                     curGame.eliminatePlayer(curPlayer);
