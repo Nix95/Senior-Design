@@ -1,6 +1,7 @@
 package com.ips.inplainsight;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -42,22 +43,25 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Random;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, com.google.android.gms.location.LocationListener {
 
 
     long diff;
+    int AoD;
     Intent intent;
     int intentChange = 0;
+
+    //temp objects
     PlayerClass curPlayer = new PlayerClass();
     PlayerClass targetPlayer = new PlayerClass();
+    PlayerClass asPlayer = new PlayerClass();
 
     Game curGame = new Game();
 
@@ -122,6 +126,15 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mTextView = findViewById(R.id.DirectionTextView);
         llTextView = findViewById(R.id.LatLongTextView);
 
+        //temp objects
+        asPlayer.userName = "asPlayer";
+        curPlayer.userName = "curPlayer";
+        targetPlayer.userName = "targetPlayer";
+        curGame.addPlayer(asPlayer);
+        curGame.addPlayer(curPlayer);
+        curGame.addPlayer(targetPlayer);
+        //Log.d(TAG, "Target: " + targetPlayer.getTarget());
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult){
@@ -150,7 +163,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                         llTextView.setTextColor(Color.parseColor("#000000"));
                     }
 
-                    //Dummy player hot cold TODO replace with target
+                    //Dummy player hot cold TODO add assassin
                     //TextView mTextView = findViewById(R.id.DirectionTextView);
                     if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 50){
                         //player out of outer bounds, DQ
@@ -165,15 +178,31 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                             distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 5){
                         mTextView.setTextColor(Color.parseColor("#ff0000"));
                     }
-                    else{
+                    else if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5 ||
+                            distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5){
                         //TODO go to mini game intent and handle elimination
+
+                        if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5){
+                            AoD = 0;
+                        }
+                        else if(distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5){
+                            AoD = 1;
+                        }
                             intent = new Intent(MainGame.this, MiniGameActivity.class);
 
-                            if(intentChange == 0) {
+                        if(AoD==0 && intentChange==0) { //Atacking, elim other or refresh if lose
+                            if (curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
                                 //Log.d(TAG, intentChange + " : Swithcing intent");
                                 intentChange = 1;
                                 startActivityForResult(intent, 1);
                             }
+                        }
+                        else if(AoD==1 && intentChange==0) { //Defending, get away if win eliminate if lose
+                            if (curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
+                                intentChange = 1;
+                                startActivityForResult(intent, 1);
+                            }
+                        }
                     }
                 }
             }
@@ -187,12 +216,63 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        long d = 5000;
+        final Handler h = new Handler();
+
         switch(requestCode){
             case 1:
                 diff = data.getLongExtra("diff", -1);
                 intentChange = data.getIntExtra("toRun", 0);
                 Log.d(TAG, diff + " : diff time");
                 curPlayer.reactTime = diff;
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(AoD==0){ //Atacking, elim other or refresh if lose
+                            if(curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
+                                if (diff < curPlayer.getTarget().reactTime) {
+                                    Log.d(TAG, "Taking out target. Pr: " + curGame.getPlayersRemaining());
+                                    curPlayer.reactTime = 5000; //reset your reaction time
+                                    Log.d(TAG, curGame.getPlayersRemaining() + " : Players remaining");
+                                    if(curGame.getPlayersRemaining()<=2){ //win/lose
+                                        Toast.makeText(getApplication().getApplicationContext(), "YOU WON!", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "WIN");
+                                        //TODO go to lobby
+                                    }
+                                    curGame.eliminatePlayer(curPlayer.getTarget());
+                                    Toast.makeText(getApplication().getApplicationContext(), "Target eliminated!", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getApplication().getApplicationContext(), "Target escaped!\nWait two minutes to attack.", Toast.LENGTH_LONG).show();
+                                    //possibly new handler and run to a refresh screen
+                                    Log.d(TAG, " : they defended");
+                                    curPlayer.setCanAD_False();
+                                    curPlayer.getTarget().setCanAD_False();
+                                }
+                            }
+                        }
+                        else if(AoD==1){ //Defending, get away if win eliminate if lose
+                            if(curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
+                                if (diff < curPlayer.getAssassin().reactTime) {//
+                                    //refresh
+                                    Toast.makeText(getApplication().getApplicationContext(), "You Escaped!\nYou have two minutes to get away.", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, " : you defended");
+                                    curPlayer.setCanAD_False();
+                                    curPlayer.getAssassin().setCanAD_False();
+                                } else {
+                                    //TODO go to lobby possible splash screen.
+                                    if(curGame.getPlayersRemaining()<=2){//win/lose
+                                        Toast.makeText(getApplication().getApplicationContext(), "YOU LOSE!", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, " : LOSE");
+                                        //TODO go to lobby
+                                    }
+                                    Toast.makeText(getApplication().getApplicationContext(), "You were eliminated!", Toast.LENGTH_LONG).show();
+                                    curGame.eliminatePlayer(curPlayer);
+                                }
+                            }
+                        }
+                    }
+                }, d); //ensures the other time is gotten or default lose after 5 second. Maybe have this be the refresh
+
                 break;
         }
     }
@@ -296,6 +376,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 .strokeColor(Color.BLUE));
 
         targetPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
+        asPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
     }
 
     /**
