@@ -22,6 +22,14 @@ public class PlayerClass {
     private boolean inOuterBounds;
     //Power-Ups
 
+    public PlayerClass() {
+
+    }
+
+    public PlayerClass(String userName) {
+        this.userName = userName;
+    }
+
     private static final String TAG = "PlayerClass";
 
     public boolean getCanAD() {
