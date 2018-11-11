@@ -61,6 +61,10 @@ public class Lobby extends AppCompatActivity {
 
         /*
         private static final String TAG = "MainActivity";
+
+
+        /*
+        private static final String TAG = "MainActivity";
         //vars
         private ArrayList<String> mNames = new ArrayList<>();
         @Override
