@@ -62,17 +62,17 @@ public class Lobby extends AppCompatActivity {
         /*
         private static final String TAG = "MainActivity";
 
+
+        /*
+        private static final String TAG = "MainActivity";
         //vars
         private ArrayList<String> mNames = new ArrayList<>();
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_lobby);
             Log.d(TAG, "onCreate: started.");
-
         }
-
         private void initRecyclerView(){
             Log.d(TAG, "initRecyclerView: init recyclerview.");
             RecyclerView recyclerView = findViewById(R.id.recyclerv_view);
