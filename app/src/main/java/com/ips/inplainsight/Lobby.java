@@ -58,6 +58,7 @@ public class Lobby extends AppCompatActivity {
 
         new GetDataFromFirebase().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+
         // Read from the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference mRef = database.getReference("games");
@@ -100,6 +101,9 @@ public class Lobby extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             return false;
+
+        
+
         }
 
         @Override
@@ -110,3 +114,4 @@ public class Lobby extends AppCompatActivity {
 
 
 }
+
