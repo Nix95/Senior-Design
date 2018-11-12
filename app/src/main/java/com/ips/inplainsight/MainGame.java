@@ -63,7 +63,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     PlayerClass targetPlayer = new PlayerClass();
     PlayerClass asPlayer = new PlayerClass();
 
-    Game curGame = new Game();
+    Game curGame;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -131,7 +131,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //lobby = new Intent(this, Lobby.class);
 
         //temp objects
-        curPlayer = (PlayerClass)getIntent().getParcelableExtra("currPlayer");
+        curPlayer = (PlayerClass)getIntent().getExtras().getParcelable("currPlayer");
+        curGame = (Game)getIntent().getExtras().getParcelable("gts");
+
+        Log.d(TAG, "got the game: "+curGame.gameId);
+
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
@@ -364,15 +368,18 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
 
-        curGame.setSeedLoc(new LatLng(29.663350, -82.378250));
+        curGame.setSeedLoc(new MyLatLng(29.663350, -82.378250));
+        LatLng temp = new LatLng(curGame.getSeedLoc().latitude, curGame.getSeedLoc().longitude);
 
         circleInner = mMap.addCircle(new CircleOptions()
-                .center(curGame.getSeedLoc())
+                //.center(curGame.getSeedLoc())
+                .center(temp)
                 .radius(700) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLACK));
         circleOuter = mMap.addCircle(new CircleOptions()
-                .center(curGame.getSeedLoc())
+                //.center(curGame.getSeedLoc())
+                .center(temp)
                 .radius(1000) // In meters
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));

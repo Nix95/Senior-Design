@@ -89,10 +89,18 @@ public class Lobby extends AppCompatActivity {
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
-                //Game gts = new Game();
+                Game gts = new Game();
                 //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
-                //Log.d(TAG, "game to pass "+gts.gameId);
+                gts = gameList.get(0);
+                Log.d(TAG, "game to pass "+gts.gameId);
+
+                //Bundle extras = new Bundle();
+                //extras.putParcelable("0", player);
+                //extras.putParcelable("1", gts);
+                //currGame.putExtras(extras);
+
                 currGame.putExtra("currPlayer", player);
+                currGame.putExtra("gts", gts);
                 startActivity(currGame);
             }
 
