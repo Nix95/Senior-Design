@@ -44,7 +44,7 @@ public class MiniGameActivity extends MainGame {
                         react = System.currentTimeMillis();
                         diff = react - init;
                         i.putExtra("diff", diff);
-                        i.putExtra("toRun", 1);
+                        i.putExtra("toRun", 0);
                         setResult(Activity.RESULT_OK, i);
                         //startActivity(i);
                         finish();
