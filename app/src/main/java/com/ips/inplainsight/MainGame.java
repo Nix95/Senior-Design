@@ -140,9 +140,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
         Log.d(TAG, "Current Player is: " + curPlayer.uID);
-        curGame.addPlayer(asPlayer);
+        //curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
-        curGame.addPlayer(targetPlayer);
+        //curGame.addPlayer(targetPlayer);
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
         //FirebaseDatabase database = FirebaseDatabase.getInstance();
         //DatabaseReference mRef = database.getReference("dummy");
@@ -162,6 +162,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
                     //in bounds
                     if(curGame.getPlayersRemaining()>1) {
+                        Log.d(TAG, "players remaining at start: " + curGame.getPlayersRemaining());
                         if (distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()) {
                             //player out of outer bounds, DQ
                             llTextView.setTextColor(Color.parseColor("#ff0000"));
