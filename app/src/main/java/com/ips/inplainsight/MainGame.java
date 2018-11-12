@@ -59,7 +59,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     int intentChange = 0;
 
     //temp objects
-    PlayerClass curPlayer = new PlayerClass();
+    PlayerClass curPlayer;
     PlayerClass targetPlayer = new PlayerClass();
     PlayerClass asPlayer = new PlayerClass();
 
@@ -131,9 +131,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //lobby = new Intent(this, Lobby.class);
 
         //temp objects
+        curPlayer = (PlayerClass)getIntent().getParcelableExtra("currPlayer");
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
+        Log.d(TAG, "Current Player is: " + curPlayer.uID);
         curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
         curGame.addPlayer(targetPlayer);

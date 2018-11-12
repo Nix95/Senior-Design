@@ -1,5 +1,6 @@
 package com.ips.inplainsight;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -22,13 +23,15 @@ public class Lobby extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
+    Intent currGame;
     private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+        PlayerClass player = (PlayerClass)getIntent().getParcelableExtra("User");
+        currGame = new Intent(this, MainGame.class);
 
         /*
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
@@ -79,6 +82,8 @@ public class Lobby extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
         */
-
+        currGame.putExtra("currPlayer", player);
+        //TODO PASS GAME
+        startActivity(currGame);
     }
 }
