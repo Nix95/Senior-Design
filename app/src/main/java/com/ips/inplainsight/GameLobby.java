@@ -1,4 +1,8 @@
-/* MAY NOT USE*/
+/************************************
+  NOT USING THIS GAME LOBBY FILE
+  USING Lobby.java
+ **************************************/
+
 package com.ips.inplainsight;
 
 import android.content.Context;

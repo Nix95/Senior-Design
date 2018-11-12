@@ -26,6 +26,7 @@ public class Lobby extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 
     Intent currGame;
+    PlayerClass player;
 
     private DatabaseReference mDatabase;
     private static final String TAG = "lobby";
@@ -34,10 +35,11 @@ public class Lobby extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
-        PlayerClass player = (PlayerClass)getIntent().getParcelableExtra("User");
+
+        player = (PlayerClass)getIntent().getParcelableExtra("User");
         currGame = new Intent(this, MainGame.class);
 
-        /* *********************************
+        /************************************
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
 
         Game game1 = new Game("1", new LatLng(29.663350, -82.378250)); //construct initial game
@@ -50,7 +52,7 @@ public class Lobby extends AppCompatActivity {
         mDatabase.child("games").push().setValue(game2);
         mDatabase.child("games").push().setValue(game3);
 
-        *********************************** */
+        *************************************/
 
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -77,14 +79,21 @@ public class Lobby extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 ArrayList<String> values = new ArrayList<String>(); //dataSnapshot.getValue();
+                ArrayList<Game> gameList = new ArrayList<Game>();
 
                 for(DataSnapshot dsp : dataSnapshot.getChildren()){
                     Log.d(TAG, "value being added"+String.valueOf(dsp.getKey()));
                     // add gameId to ArrayList
                     values.add(String.valueOf(dsp.child("gameId").getValue(String.class))); //add result into array list
+                    gameList.add(dsp.getValue(Game.class));
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
+                //Game gts = new Game();
+                //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
+                //Log.d(TAG, "game to pass "+gts.gameId);
+                currGame.putExtra("currPlayer", player);
+                startActivity(currGame);
             }
 
             @Override

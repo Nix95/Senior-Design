@@ -28,8 +28,6 @@ public class SplashScreen extends AppCompatActivity {
 
         }, 5*1000); // wait for 5 seconds
 
-        //startActivity(new Intent(SplashScreen.this,SecondSplash.class));
-        // close splash activity
-        //finish();
+
     }
 }
