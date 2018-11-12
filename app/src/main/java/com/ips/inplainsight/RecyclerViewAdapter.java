@@ -16,14 +16,12 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static final String TAG = "RecyclerViewAdapter";
 
-    private ArrayList<String> mGameNames = new ArrayList<>();
+    private ArrayList<String> gameNames;
     //private ArrayList<String> mImages = new ArrayList<>();
-    private Context mContext;
+    //private Context mContext;
 
-    public RecyclerViewAdapter(Context context, ArrayList<String> gameNames, ArrayList<String> images ) {
-        mGameNames = gameNames;
-        //mImages = images;
-        mContext = context;
+    public RecyclerViewAdapter(ArrayList<String> gameNames) {
+        this.gameNames = gameNames;
     }
 
     @Override
@@ -36,33 +34,33 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");
+        holder.gameName.setText(gameNames.get(position));
 
-
-        holder.gameName.setText(mGameNames.get(position));
-
+        /* onClickListener for message, probably dont need this
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick: clicked on: " + mGameNames.get(position));
+                Log.d(TAG, "onClick: clicked on: " + gameNames.get(position));
 
-                Toast.makeText(mContext, mGameNames.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, gameNames.get(position), Toast.LENGTH_SHORT).show();
                 }
-        });
+        });*/
     }
 
     @Override
     public int getItemCount() {
-        return mGameNames.size();
+        return gameNames.size();
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView gameName;
+        private TextView gameName;
         RelativeLayout parentLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            parentLayout = itemView.findViewById(R.id.parent_layout);
+            gameName = (TextView) itemView.findViewById(R.id.list_item_text);
+            //parentLayout = itemView.findViewById(R.id.parent_layout);
         }
     }
 
