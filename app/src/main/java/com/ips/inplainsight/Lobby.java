@@ -27,6 +27,7 @@ public class Lobby extends AppCompatActivity {
 
     Intent currGame;
     PlayerClass player;
+
     private DatabaseReference mDatabase;
     private static final String TAG = "lobby";
 
@@ -34,22 +35,24 @@ public class Lobby extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+
         player = (PlayerClass)getIntent().getParcelableExtra("User");
         currGame = new Intent(this, MainGame.class);
 
-        /*
+        /************************************
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
+
         Game game1 = new Game("1", new LatLng(29.663350, -82.378250)); //construct initial game
         Game game2 = new Game("2", new LatLng(29.663350, -82.378250)); //construct initial game
         Game game3 = new Game("3", new LatLng(29.663350, -82.378250)); //construct initial game
-        //PlayerClass p = new PlayerClass("bob");
-        //game1.addPlayer(p);
+        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
+        //game1.addPlayer(p); // add dummy player to game1
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("games").push().setValue(game1);
         mDatabase.child("games").push().setValue(game2);
-        mDatabase.push().child("games").setValue(game3);
-        */
+        mDatabase.child("games").push().setValue(game3);
 
+        *************************************/
 
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -64,7 +67,6 @@ public class Lobby extends AppCompatActivity {
 
         new GetDataFromFirebase().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-
         // Read from the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference mRef = database.getReference("games");
@@ -77,18 +79,29 @@ public class Lobby extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 ArrayList<String> values = new ArrayList<String>(); //dataSnapshot.getValue();
+                ArrayList<Game> gameList = new ArrayList<Game>();
 
                 for(DataSnapshot dsp : dataSnapshot.getChildren()){
                     Log.d(TAG, "value being added"+String.valueOf(dsp.getKey()));
                     // add gameId to ArrayList
                     values.add(String.valueOf(dsp.child("gameId").getValue(String.class))); //add result into array list
+                    gameList.add(dsp.getValue(Game.class));
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
-                Game gts = dataSnapshot.child("games/game1").getValue(Game.class);
-                Log.d(TAG, "game to pass: " + gts.gameId);
+
+                Game gts = new Game();
+                //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
+                gts = gameList.get(0);
+                Log.d(TAG, "game to pass "+gts.gameId);
+
+                //Bundle extras = new Bundle();
+                //extras.putParcelable("0", player);
+                //extras.putParcelable("1", gts);
+                //currGame.putExtras(extras);
+
                 currGame.putExtra("currPlayer", player);
-                //TODO PASS GAME
+                currGame.putExtra("gts", gts);
                 startActivity(currGame);
             }
 
@@ -98,7 +111,6 @@ public class Lobby extends AppCompatActivity {
                 System.out.println("Failed to read value." + error.toException());
             }
         });
-
 
 
     }
@@ -113,17 +125,14 @@ public class Lobby extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             return false;
-
-        
-
         }
+
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
         }
 
     }
-
 
 }
 

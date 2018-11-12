@@ -18,7 +18,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 // start splash activity
-                Intent i = new Intent(SplashScreen.this, Lobby.class);
+                Intent i = new Intent(SplashScreen.this, Login.class);
                 startActivity(i);
 
                 // close splash activity
@@ -28,8 +28,6 @@ public class SplashScreen extends AppCompatActivity {
 
         }, 5*1000); // wait for 5 seconds
 
-        //startActivity(new Intent(SplashScreen.this,SecondSplash.class));
-        // close splash activity
-        //finish();
+
     }
 }

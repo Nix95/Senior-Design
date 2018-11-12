@@ -34,6 +34,8 @@ public class PlayerClass implements Parcelable {
     private static final String TAG = "PlayerClass";
 
     protected PlayerClass(Parcel in) {
+        uID = in.readString();
+        userName = in.readString();
         reactTime = in.readLong();
         canAD = in.readByte() != 0;
         target = in.readParcelable(PlayerClass.class.getClassLoader());
@@ -121,10 +123,11 @@ public class PlayerClass implements Parcelable {
         dest.writeString(userName);
         dest.writeLong(reactTime);
         dest.writeByte((byte)(canAD?1:0));
-        dest.writeByte((byte)(inInnerBounds?1:0));
-        dest.writeByte((byte)(inOuterBounds?1:0));
         dest.writeParcelable(target, flags);
         dest.writeParcelable(assassin, flags);
         dest.writeParcelable(curLoc, flags);
+        dest.writeByte((byte)(inInnerBounds?1:0));
+        dest.writeByte((byte)(inOuterBounds?1:0));
+
     }
 }

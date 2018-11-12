@@ -1,20 +1,41 @@
 package com.ips.inplainsight;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.LinkedList;
 
-public class Game  {
+public class Game implements Parcelable {
     public String gameId;
     private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
-    private LatLng seedLoc;
+
+    private MyLatLng seedLoc;
+
     public int durationSeconds;
     private int playersRemaining = 0;
     private static final String TAG = "GameClass";
+
+
+    protected Game(Parcel in){
+        gameId = in.readString();
+        //players = in.readParcelable(LinkedList<PlayerClass>.class.getClassLoader());
+        in.readTypedList(players, PlayerClass.CREATOR);
+        seedLoc = in.readParcelable(MyLatLng.class.getClassLoader());
+        playersRemaining = in.readInt();
+        durationSeconds = in.readInt();
+    }
+    public static final Creator<Game> CREATOR = new Creator<Game>() {
+        @Override
+        public Game createFromParcel(Parcel in) {
+            return new Game(in);
+        }
+
+        @Override
+        public Game[] newArray(int i) {
+            return new Game[i];
+        }
+    };
+
 
     public LinkedList<PlayerClass> getPlayers() {
         return players;
@@ -69,7 +90,7 @@ public class Game  {
         playersRemaining--;
     }
 
-    public Game(String gameId, LatLng seedLoc) {
+    public Game(String gameId, MyLatLng seedLoc) {
         this.gameId = gameId;
         //this.players = players;
         this.seedLoc = seedLoc;
@@ -80,11 +101,11 @@ public class Game  {
     }
 
 
-    public LatLng getSeedLoc() {
+    public MyLatLng getSeedLoc() {
         return seedLoc;
     }
 
-    public void setSeedLoc(LatLng seedLoc) {
+    public void setSeedLoc(MyLatLng seedLoc) {
         this.seedLoc = seedLoc;
     }
 
@@ -94,6 +115,21 @@ public class Game  {
 
     public void setPlayersRemaining(int playersRemaining) {
         this.playersRemaining = playersRemaining;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel in, int i) {
+        in.writeString(gameId);
+        //in.writeParcelable((Parcelable) players, i);
+        in.writeTypedList(players);
+        in.writeParcelable((Parcelable) seedLoc, i);
+        in.writeInt(playersRemaining);
+        in.writeInt(durationSeconds);
     }
 }
 
