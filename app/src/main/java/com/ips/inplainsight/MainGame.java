@@ -138,7 +138,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         curGame.addPlayer(curPlayer);
         curGame.addPlayer(targetPlayer);
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
-
+        //FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //DatabaseReference mRef = database.getReference("dummy");
+        //mDatabase = FirebaseDatabase.getInstance().getReference();
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult){
@@ -153,7 +155,6 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
 
                     //in bounds
-
                     if(distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()){
                         //player out of outer bounds, DQ
                         llTextView.setTextColor(Color.parseColor("#ff0000"));

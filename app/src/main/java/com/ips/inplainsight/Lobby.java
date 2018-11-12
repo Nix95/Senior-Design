@@ -79,6 +79,8 @@ public class Lobby extends AppCompatActivity {
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
+                Game curGame = dataSnapshot.child("games/game1").getValue(Game.class);
+                Log.d(TAG, "game to pass: " + curGame.gameId);
             }
 
             @Override

@@ -12,14 +12,9 @@ public class Game  {
     public String gameId;
     private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
     private LatLng seedLoc;
-//<<<<<<< HEAD
-    //public int durationSeconds;
-////=======
     public int durationSeconds;
     private int playersRemaining = 0;
-
     private static final String TAG = "GameClass";
-//>>>>>>> dev
 
     public LinkedList<PlayerClass> getPlayers() {
         return players;
