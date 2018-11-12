@@ -26,7 +26,7 @@ public class Lobby extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 
     Intent currGame;
-
+    PlayerClass player;
     private DatabaseReference mDatabase;
     private static final String TAG = "lobby";
 
@@ -34,7 +34,7 @@ public class Lobby extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
-        PlayerClass player = (PlayerClass)getIntent().getParcelableExtra("User");
+        player = (PlayerClass)getIntent().getParcelableExtra("User");
         currGame = new Intent(this, MainGame.class);
 
         /*
@@ -85,8 +85,11 @@ public class Lobby extends AppCompatActivity {
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
-                Game curGame = dataSnapshot.child("games/game1").getValue(Game.class);
-                Log.d(TAG, "game to pass: " + curGame.gameId);
+                Game gts = dataSnapshot.child("games/game1").getValue(Game.class);
+                Log.d(TAG, "game to pass: " + gts.gameId);
+                currGame.putExtra("currPlayer", player);
+                //TODO PASS GAME
+                startActivity(currGame);
             }
 
             @Override
@@ -95,6 +98,7 @@ public class Lobby extends AppCompatActivity {
                 System.out.println("Failed to read value." + error.toException());
             }
         });
+
 
 
     }
@@ -113,13 +117,6 @@ public class Lobby extends AppCompatActivity {
         
 
         }
-
-        */
-        currGame.putExtra("currPlayer", player);
-        //TODO PASS GAME
-        startActivity(currGame);
-
-
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
