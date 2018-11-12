@@ -8,12 +8,13 @@ import java.util.LinkedList;
 public class Game implements Parcelable {
     public String gameId;
     private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
+
     private MyLatLng seedLoc;
 
     public int durationSeconds;
     private int playersRemaining = 0;
-
     private static final String TAG = "GameClass";
+
 
     protected Game(Parcel in){
         gameId = in.readString();
@@ -34,6 +35,7 @@ public class Game implements Parcelable {
             return new Game[i];
         }
     };
+
 
     public LinkedList<PlayerClass> getPlayers() {
         return players;

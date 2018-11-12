@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.2'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    //implimentation 'com.android.support:recyclerview-v7:27.1.1'
 
     implementation 'com.google.android.gms:play-services-flags:15.0.1'
     implementation 'com.google.firebase:firebase-auth:16.0.1'

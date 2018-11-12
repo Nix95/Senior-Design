@@ -66,8 +66,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "I made it to onStart");
-    // Check for existing Google Sign In account, if the user is already signed in
-    // the GoogleSignInAccount will be non-null.
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
 
@@ -123,7 +123,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 //            handleSignInResult(task);
 //        }
 //    }
-                // THIS IS FIREBASE SIGN IN ONACTIVITYRESULT
+    // THIS IS FIREBASE SIGN IN ONACTIVITYRESULT
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -161,7 +161,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                           // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             updateUI(null);
                         }
 
@@ -255,7 +255,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-//    public void privacyAndTerms() {
+    //    public void privacyAndTerms() {
 //        List<AuthUI.IdpConfig> providers = Collections.emptyList();
 //        // [START auth_fui_pp_tos]
 //        startActivityForResult(
@@ -277,7 +277,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         } else if (i == R.id.sign_out_button) {
             signOut();
         } else if (i == R.id.disconnect_button) {
-        revokeAccess();
-    }
+            revokeAccess();
+        }
     }
 }
