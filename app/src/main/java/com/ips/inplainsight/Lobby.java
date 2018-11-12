@@ -24,6 +24,7 @@ public class Lobby extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private DatabaseReference mDatabase;
+    private static final String TAG = "lobby";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +37,13 @@ public class Lobby extends AppCompatActivity {
         Game game2 = new Game("2", new LatLng(29.663350, -82.378250)); //construct initial game
         Game game3 = new Game("3", new LatLng(29.663350, -82.378250)); //construct initial game
         //PlayerClass p = new PlayerClass("bob");
-        //newGame.addPlayer(p);
+        //game1.addPlayer(p);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("games").push().setValue(game1);
         mDatabase.child("games").push().setValue(game2);
         mDatabase.push().child("games").setValue(game3);
         */
+
 
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -63,11 +65,19 @@ public class Lobby extends AppCompatActivity {
         mRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                //Log.d(TAG, "inside of onDataChange called.");
 
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                ArrayList<String> values = (ArrayList<String>) dataSnapshot.getValue();
-                mGameList.setAdapter(new RecyclerViewAdapter(values));
+                ArrayList<String> values = new ArrayList<String>(); //dataSnapshot.getValue();
+
+                for(DataSnapshot dsp : dataSnapshot.getChildren()){
+                    Log.d(TAG, "value being added"+String.valueOf(dsp.getKey()));
+                    // add gameId to ArrayList
+                    values.add(String.valueOf(dsp.child("gameId").getValue(String.class))); //add result into array list
+                }
+
+                mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
             }
 
             @Override
