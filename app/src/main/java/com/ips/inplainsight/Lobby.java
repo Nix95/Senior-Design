@@ -58,7 +58,7 @@ public class Lobby extends AppCompatActivity {
 
         // Read from the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference mRef = database.getReference("games");
+        DatabaseReference mRef = database.getReference("dummy");
 
         mRef.addValueEventListener(new ValueEventListener() {
             @Override
