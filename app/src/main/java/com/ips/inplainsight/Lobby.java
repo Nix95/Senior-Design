@@ -37,18 +37,20 @@ public class Lobby extends AppCompatActivity {
         PlayerClass player = (PlayerClass)getIntent().getParcelableExtra("User");
         currGame = new Intent(this, MainGame.class);
 
-        /*
+        /* *********************************
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
+
         Game game1 = new Game("1", new LatLng(29.663350, -82.378250)); //construct initial game
         Game game2 = new Game("2", new LatLng(29.663350, -82.378250)); //construct initial game
         Game game3 = new Game("3", new LatLng(29.663350, -82.378250)); //construct initial game
-        //PlayerClass p = new PlayerClass("bob");
-        //game1.addPlayer(p);
+        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
+        //game1.addPlayer(p); // add dummy player to game1
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("games").push().setValue(game1);
         mDatabase.child("games").push().setValue(game2);
-        mDatabase.push().child("games").setValue(game3);
-        */
+        mDatabase.child("games").push().setValue(game3);
+
+        *********************************** */
 
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -105,12 +107,6 @@ public class Lobby extends AppCompatActivity {
         protected Boolean doInBackground(Void... voids) {
             return false;
         }
-
-        */
-        currGame.putExtra("currPlayer", player);
-        //TODO PASS GAME
-        startActivity(currGame);
-
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
