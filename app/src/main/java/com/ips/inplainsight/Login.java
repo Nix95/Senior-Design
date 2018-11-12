@@ -3,6 +3,7 @@ package com.ips.inplainsight;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -38,12 +39,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     View v;
     SignInButton signInButton;
     private FirebaseAuth mAuth;
+    Intent lobby;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         Log.d(TAG, "Made it to onCreate");
         //v = findViewById(R.id.sign_in_button);
+        lobby = new Intent(this, Lobby.class);
 
         setContentView(R.layout.activity_login);
 
@@ -151,7 +154,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            PlayerClass player = new PlayerClass(getString(R.string.firebase_status_fmt, user.getUid()));
+                            lobby.putExtra("User", player);
                             updateUI(user);
+                            startActivity(lobby);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());

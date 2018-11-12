@@ -59,7 +59,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     int intentChange = 0;
 
     //temp objects
-    PlayerClass curPlayer = new PlayerClass();
+    PlayerClass curPlayer;
     PlayerClass targetPlayer = new PlayerClass();
     PlayerClass asPlayer = new PlayerClass();
 
@@ -131,9 +131,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         lobby = new Intent(this, Lobby.class);
 
         //temp objects
+        curPlayer = (PlayerClass)getIntent().getParcelableExtra("currPlayer");
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
+        Log.d(TAG, "Current Player is: " + curPlayer.uID);
         curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
         curGame.addPlayer(targetPlayer);
@@ -155,57 +157,52 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
 
                     //in bounds
-                    if(distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()){
-                        //player out of outer bounds, DQ
-                        llTextView.setTextColor(Color.parseColor("#ff0000"));
-                    }
-                    else if(distance(location.getLatitude(), circleInner.getCenter().latitude, location.getLongitude(), circleInner.getCenter().longitude) > circleInner.getRadius()){
-                        //Player out of inner bounds, gets damage
-                        llTextView.setTextColor(Color.parseColor("#0000ff"));
-                    }
-                    else{
-                        //reset view changes
-                        llTextView.setTextColor(Color.parseColor("#000000"));
-                    }
-
-                    //Dummy player hot cold TODO add assassin
-                    //TextView mTextView = findViewById(R.id.DirectionTextView);
-                    if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 50){
-                        //player out of outer bounds, DQ
-                        mTextView.setTextColor(Color.parseColor("#0000ff"));
-                    }
-                    else if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 49 &&
-                            distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 25){
-                        //Player out of inner bounds, gets damage
-                        mTextView.setTextColor(Color.parseColor("#ffa500"));
-                    }
-                    else if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 24 &&
-                            distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 5){
-                        mTextView.setTextColor(Color.parseColor("#ff0000"));
-                    }
-                    else if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5 ||
-                            distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5){
-                        //TODO go to mini game intent and handle elimination
-
-                        if(distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5){
-                            AoD = 0;
+                    if(curGame.getPlayersRemaining()>1) {
+                        if (distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()) {
+                            //player out of outer bounds, DQ
+                            llTextView.setTextColor(Color.parseColor("#ff0000"));
+                        } else if (distance(location.getLatitude(), circleInner.getCenter().latitude, location.getLongitude(), circleInner.getCenter().longitude) > circleInner.getRadius()) {
+                            //Player out of inner bounds, gets damage
+                            llTextView.setTextColor(Color.parseColor("#0000ff"));
+                        } else {
+                            //reset view changes
+                            llTextView.setTextColor(Color.parseColor("#000000"));
                         }
-                        else if(distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5){
-                            AoD = 1;
-                        }
+
+                        //Dummy player hot cold TODO add assassin
+                        //TextView mTextView = findViewById(R.id.DirectionTextView);
+                        if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 50) {
+                            //player out of outer bounds, DQ
+                            mTextView.setTextColor(Color.parseColor("#0000ff"));
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 49 &&
+                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 25) {
+                            //Player out of inner bounds, gets damage
+                            mTextView.setTextColor(Color.parseColor("#ffa500"));
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 24 &&
+                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 5) {
+                            mTextView.setTextColor(Color.parseColor("#ff0000"));
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5 ||
+                                distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5) {
+                            //TODO go to mini game intent and handle elimination
+
+                            if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5) {
+                                AoD = 0;
+                            } else if (distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5) {
+                                AoD = 1;
+                            }
                             intent = new Intent(MainGame.this, MiniGameActivity.class);
 
-                        if(AoD==0 && intentChange==0) { //Atacking, elim other or refresh if lose
-                            if (curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
-                                //Log.d(TAG, intentChange + " : Swithcing intent");
-                                intentChange = 1;
-                                startActivityForResult(intent, 1);
-                            }
-                        }
-                        else if(AoD==1 && intentChange==0) { //Defending, get away if win eliminate if lose
-                            if (curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
-                                intentChange = 1;
-                                startActivityForResult(intent, 1);
+                            if (AoD == 0 && intentChange == 0) { //Atacking, elim other or refresh if lose
+                                if (curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
+                                    //Log.d(TAG, intentChange + " : Swithcing intent");
+                                    intentChange = 1;
+                                    startActivityForResult(intent, 1);
+                                }
+                            } else if (AoD == 1 && intentChange == 0) { //Defending, get away if win eliminate if lose
+                                if (curPlayer.getCanAD() && curPlayer.getAssassin().getCanAD()) {
+                                    intentChange = 1;
+                                    startActivityForResult(intent, 1);
+                                }
                             }
                         }
                     }
