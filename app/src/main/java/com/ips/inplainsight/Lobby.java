@@ -44,7 +44,6 @@ public class Lobby extends AppCompatActivity {
         mDatabase.push().child("games").setValue(game3);
         */
 
-
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -57,7 +56,6 @@ public class Lobby extends AppCompatActivity {
         mGameList.setAdapter(mAdapter);
 
         new GetDataFromFirebase().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
 
         // Read from the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -88,7 +86,6 @@ public class Lobby extends AppCompatActivity {
             }
         });
 
-
     }
 
     private class GetDataFromFirebase extends AsyncTask<Void,Void,Boolean>{
@@ -101,9 +98,6 @@ public class Lobby extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             return false;
-
-        
-
         }
 
         @Override
@@ -111,7 +105,6 @@ public class Lobby extends AppCompatActivity {
             super.onPostExecute(aBoolean);
         }
     }
-
 
 }
 
