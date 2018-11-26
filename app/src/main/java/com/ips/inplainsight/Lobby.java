@@ -89,6 +89,7 @@ public class Lobby extends AppCompatActivity {
                 }
 
                 mGameList.setAdapter(new RecyclerViewAdapter(values)); //display ArrayList in Recycler View
+
                 Game gts = new Game();
                 //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
                 gts = gameList.get(0);
@@ -110,6 +111,7 @@ public class Lobby extends AppCompatActivity {
                 System.out.println("Failed to read value." + error.toException());
             }
         });
+
 
     }
 
