@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -101,12 +103,15 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     Handler h = new Handler();
-    int delay = 3000; //milliseconds
+    int delay = 180000; //milliseconds
     Runnable runnable;
     TextView mTextView;
     TextView llTextView;
 
     Intent lobby;
+
+    FirebaseDatabase database;
+    DatabaseReference mRef;
 
     //@Override
     //public void onPause() {
@@ -144,8 +149,12 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         curGame.addPlayer(curPlayer);
         //curGame.addPlayer(targetPlayer);
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
-        //FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //DatabaseReference mRef = database.getReference("dummy");
+        database = FirebaseDatabase.getInstance();
+        mRef = database.getReference("games").child("game1");
+        //Log.d(TAG, "FB test: " + mRef.getKey());
+        //mRef.setValue(curGame);
+        //String child = ;
+        //mRef = mRef.child("");
         //mDatabase = FirebaseDatabase.getInstance().getReference();
         mLocationCallback = new LocationCallback() {
             @Override
