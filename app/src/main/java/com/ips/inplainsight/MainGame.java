@@ -113,6 +113,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
     Intent lobby;
 
+    Handler h2 = new Handler();
+
     FirebaseDatabase database;
     DatabaseReference mRef;
 
@@ -168,9 +170,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 for(Location location : locationResult.getLocations()){
                     //Update UI
                     curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
-                    Map<String, Object> postValues = new HashMap<String,Object>();
-                    postValues.put("players",curGame.getPlayers());
-                    mRef.updateChildren(postValues);
+//                    Map<String, Object> postValues = new HashMap<String,Object>();
+//                    postValues.put("players",curGame.getPlayers());
+//                    mRef.updateChildren(postValues);
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
@@ -305,7 +307,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-
+            Log.d(TAG, "onlocationchange");
         }
     }
 
@@ -317,7 +319,16 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
-        h.postDelayed( runnable = new Runnable() {
+//        h2.postDelayed(runnable = new Runnable() {
+//            public void run() {
+//                Map<String, Object> postValues = new HashMap<String,Object>();
+//                postValues.put("players",curGame.getPlayers());
+//                mRef.updateChildren(postValues);
+//                h2.postDelayed(runnable, 1000);
+//            }
+//        }, 1000);
+
+        h.postDelayed(runnable = new Runnable() {
             public void run() {
                 double shrink = 0.7;
                 double shrinkInv = 1 - shrink;
