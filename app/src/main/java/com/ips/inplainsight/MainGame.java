@@ -35,8 +35,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -192,9 +195,22 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 for(Location location : locationResult.getLocations()){
                     //Update UI
                     curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
-//                    Map<String, Object> postValues = new HashMap<String,Object>();
-//                    postValues.put("players",curGame.getPlayers());
-//                    mRef.updateChildren(postValues);
+                    Map<String, Object> postValues = new HashMap<String,Object>();
+                    postValues.put("players",curGame.getPlayers());
+                    mRef.updateChildren(postValues);
+
+                    mRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dsp) {
+                            curGame.setPlayers((ArrayList<PlayerClass>)dsp.child("players").getValue());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
@@ -271,6 +287,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 intentChange = data.getIntExtra("toRun", 0);
                 Log.d(TAG, diff + " : diff time");
                 curPlayer.reactTime = diff;
+
+                Map<String, Object> postValues = new HashMap<String,Object>();
+                postValues.put("players",curGame.getPlayers());
+                mRef.updateChildren(postValues);
+
                 h.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -318,6 +339,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                 }
                             }
                         }
+                        Map<String, Object> postValues = new HashMap<String,Object>();
+                        postValues.put("players",curGame.getPlayers());
+                        mRef.updateChildren(postValues);
                     }
                 }, d); //ensures the other time is gotten or default lose after 5 second. Maybe have this be the refresh
 

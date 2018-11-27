@@ -43,6 +43,9 @@ public class Game implements Parcelable {
         }
     };
 
+    public void setPlayers(ArrayList<PlayerClass> players) {
+        this.players = players;
+    }
 
     public ArrayList<PlayerClass> getPlayers() {
         return players;
@@ -53,20 +56,20 @@ public class Game implements Parcelable {
         if(playersRemaining==0){
             players.add(player);
         }
-//        else if(playersRemaining==1){
-//            player.setTarget(players.get(0));
-//            player.setAssassin(players.get(0));
-//            players.get(0).setTarget(player);
-//            players.get(0).setAssassin(player);
-//            players.add(player);
-//        }
-//        else {
-//            player.setTarget(players.get(0)); //target is first player "circular"
-//            player.setAssassin(players.get(players.size()-1)); //assassin was previous last
-//            players.get(players.size()-1).setTarget(player);
-//            players.get(0).setAssassin(player);
-//            players.add(player); //adds to end of list
-//        }
+        else if(playersRemaining==1){
+            player.setTarget(players.get(0));
+            player.setAssassin(players.get(0));
+            players.get(0).setTarget(player);
+            players.get(0).setAssassin(player);
+            players.add(player);
+        }
+        else {
+            player.setTarget(players.get(0)); //target is first player "circular"
+            player.setAssassin(players.get(players.size()-1)); //assassin was previous last
+            players.get(players.size()-1).setTarget(player);
+            players.get(0).setAssassin(player);
+            players.add(player); //adds to end of list
+        }
         playersRemaining++;
         //pplayers = new ParcelableLinkedList<PlayerClass>(players);
     }
