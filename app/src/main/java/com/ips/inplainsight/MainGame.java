@@ -160,29 +160,28 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
         database = FirebaseDatabase.getInstance();
         mRef = database.getReference("games").child("game1");
-        //mRef.keepSynced(true);
-        //Log.d(TAG, "FB test: " + mRef.getKey());
-        //mRef.setValue(curGame.getPlayers());
-
-        Map<String, Object> postValues = new HashMap<String,Object>();
-        postValues.put("players",curGame.getPlayers());
-        postValues.put("playersRemaining", curGame.getPlayersRemaining());
-        //postValues.put("target", curPlayer.getTarget());
-        //postValues.put("assassin", curPlayer.getAssassin());
-        mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // Write was successful!
-                Log.d(TAG, "update children worked");
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Write failed
-                        Log.d(TAG, "SHE BROKE");
-                    }
-                });
+//        //Log.d(TAG, "FB test: " + mRef.getKey());
+//        //mRef.setValue(curGame.getPlayers());
+//        mRef.setValue(curGame.getPlayers());
+//        Map<String, Object> postValues = new HashMap<String,Object>();
+//        postValues.put("players",curGame.getPlayers());
+//        postValues.put("playersRemaining", curGame.getPlayersRemaining());
+//        //postValues.put("target", curPlayer.getTarget());
+//        //postValues.put("assassin", curPlayer.getAssassin());
+//        mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+//                // Write was successful!
+//                Log.d(TAG, "update children worked");
+//            }
+//        })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Write failed
+//                        Log.d(TAG, "SHE BROKE");
+//                    }
+//                });
 
         //mRef.updateChildren("players", curGame.getPlayers());
         //String child = ;

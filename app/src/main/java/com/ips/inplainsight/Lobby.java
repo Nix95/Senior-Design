@@ -43,14 +43,14 @@ public class Lobby extends AppCompatActivity {
 
 
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
-//        ArrayList<PlayerClass> players = new ArrayList<>();
-//        Game game1 = new Game("1", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+        //ArrayList<PlayerClass> players = new ArrayList<>();
+        //Game game1 = new Game("1", new MyLatLng(29.663350, -82.378250), players); //construct initial game
 //        Game game2 = new Game("2", new MyLatLng(29.663350, -82.378250), players); //construct initial game
 //        Game game3 = new Game("3", new MyLatLng(29.663350, -82.378250), players); //construct initial game
 //        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
 //        //game1.addPlayer(p); // add dummy player to game1
-//        mDatabase = FirebaseDatabase.getInstance().getReference();
-//        mDatabase.child("games").child("game1").setValue(game1);
+       //mDatabase = FirebaseDatabase.getInstance().getReference();
+       //mDatabase.child("games").child("game1").setValue(game1);
 //        mDatabase.child("games").child("game2").setValue(game2);
 //        mDatabase.child("games").child("game3").setValue(game3);
 
