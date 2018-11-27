@@ -160,13 +160,15 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
         database = FirebaseDatabase.getInstance();
         mRef = database.getReference("games").child("game1");
-        mRef.keepSynced(true);
+        //mRef.keepSynced(true);
         //Log.d(TAG, "FB test: " + mRef.getKey());
         //mRef.setValue(curGame.getPlayers());
 
         Map<String, Object> postValues = new HashMap<String,Object>();
         postValues.put("players",curGame.getPlayers());
         postValues.put("playersRemaining", curGame.getPlayersRemaining());
+        postValues.put("target", curPlayer.getTarget());
+        postValues.put("assassin", curPlayer.getAssassin());
         mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -197,6 +199,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                     curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
                     Map<String, Object> postValues = new HashMap<String,Object>();
                     postValues.put("players",curGame.getPlayers());
+                    postValues.put("target", curPlayer.getTarget());
+                    postValues.put("assassin", curPlayer.getAssassin());
+                    postValues.put("inInnerBounds", curPlayer.isInInnerBounds());
+                    postValues.put("inOuterBounds",curPlayer.isInOuterBounds());
                     mRef.updateChildren(postValues);
 
                     mRef.addValueEventListener(new ValueEventListener() {
