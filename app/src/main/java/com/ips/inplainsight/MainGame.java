@@ -49,6 +49,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener,
@@ -144,7 +147,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
-        Log.d(TAG, "Current Player is: " + curPlayer.uID);
+        Log.d(TAG, "Players remaining: " + curGame.getPlayersRemaining() + " " + curGame.gameId);
         //curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
         //curGame.addPlayer(targetPlayer);
@@ -164,7 +167,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 }
                 for(Location location : locationResult.getLocations()){
                     //Update UI
-                    curPlayer.setCurLoc(new LatLng(location.getLatitude(), location.getLongitude()));
+                    curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
+                    Map<String, Object> postValues = new HashMap<String,Object>();
+                    postValues.put("players",curGame.getPlayers());
+                    mRef.updateChildren(postValues);
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
@@ -396,8 +402,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
 
-        targetPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
-        asPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
+        targetPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
+        asPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
     }
 
     /**

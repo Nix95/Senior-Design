@@ -3,12 +3,14 @@ package com.ips.inplainsight;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Game implements Parcelable {
     public String gameId;
-    private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
-
+    //private LinkedList<PlayerClass> players = new LinkedList<PlayerClass>();
+    //private ParcelableLinkedList<PlayerClass> pplayers = new ParcelableLinkedList<PlayerClass>(players);// = new ParcelableLinkedList<>();// = new ParcelableLinkedList<PlayerClass>();
+    private ArrayList<PlayerClass> players = new ArrayList<>();
     private MyLatLng seedLoc;
 
     public int durationSeconds;
@@ -18,8 +20,13 @@ public class Game implements Parcelable {
 
     protected Game(Parcel in){
         gameId = in.readString();
+        in.readTypedList(players,PlayerClass.CREATOR);
         //players = in.readParcelable(LinkedList<PlayerClass>.class.getClassLoader());
-        in.readTypedList(players, PlayerClass.CREATOR);
+        //copyData = ((ParcelableLinkedList<data>)xy.getParcelable("list")).getLinkedList();
+       //players = ((ParcelableLinkedList<PlayerClass>)in.readParcelable(ParcelableLinkedList.class.getClassLoader())).getLinkedList();
+        //in.readTypedList(pplayers, PlayerClass.CREATOR);
+        //players = pplayers.getLinkedList();
+        //pplayers = in.readTypedList(pplayers, PlayerClass.CREATOR);
         seedLoc = in.readParcelable(MyLatLng.class.getClassLoader());
         playersRemaining = in.readInt();
         durationSeconds = in.readInt();
@@ -37,47 +44,50 @@ public class Game implements Parcelable {
     };
 
 
-    public LinkedList<PlayerClass> getPlayers() {
+    public ArrayList<PlayerClass> getPlayers() {
         return players;
     }
 
     public void addPlayer(PlayerClass player) { //adding puts player at end of list
+        //players = pplayers.getLinkedList();
         if(playersRemaining==0){
             players.add(player);
         }
         else if(playersRemaining==1){
-            player.setTarget(players.peekFirst());
-            player.setAssassin(players.peekFirst());
-            players.peekFirst().setTarget(player);
-            players.peekFirst().setAssassin(player);
+            player.setTarget(players.get(0));
+            player.setAssassin(players.get(0));
+            players.get(0).setTarget(player);
+            players.get(0).setAssassin(player);
             players.add(player);
         }
         else {
-            player.setTarget(players.peekFirst()); //target is first player "circular"
-            player.setAssassin(players.peekLast()); //assassin was previous last
-            players.peekLast().setTarget(player);
-            players.peekFirst().setAssassin(player);
+            player.setTarget(players.get(0)); //target is first player "circular"
+            player.setAssassin(players.get(players.size()-1)); //assassin was previous last
+            players.get(players.size()-1).setTarget(player);
+            players.get(0).setAssassin(player);
             players.add(player); //adds to end of list
         }
         playersRemaining++;
+        //pplayers = new ParcelableLinkedList<PlayerClass>(players);
     }
 
     public void eliminatePlayer(PlayerClass player) { //TODO have a "you lost" screen to splash before return to lobby.
+        //players = pplayers.getLinkedList();
         if(playersRemaining==2){
             //winner
             //TODO pick winner, tell loser they lost and kick from game.
             players.remove(player);
         }
         else {
-            if(players.getFirst()==player){ //first player
-                players.get(1).setAssassin(players.peekLast()); //last targeting second
-                players.peekLast().setTarget(players.get(1)); //last targeting second
+            if(players.get(0)==player){ //first player
+                players.get(1).setAssassin(players.get(players.size()-1)); //last targeting second
+                players.get(players.size()-1).setTarget(players.get(1)); //last targeting second
                 players.remove(player);
             }
 
-            else if(players.getLast()==player){ //last player
-                players.peekFirst().setAssassin(players.get(players.size()-2)); //second to last player asaasinating first
-                players.get(players.size()-2).setTarget(players.peekFirst());//first targeting new last
+            else if(players.get(players.size()-1)==player){ //last player
+                players.get(0).setAssassin(players.get(players.size()-2)); //second to last player asaasinating first
+                players.get(players.size()-2).setTarget(players.get(0));//first targeting new last
                 players.remove(player);
             }
             else{ //any middle player
@@ -88,12 +98,14 @@ public class Game implements Parcelable {
             }
         }
         playersRemaining--;
+        //pplayers = new ParcelableLinkedList<PlayerClass>(players);
     }
 
-    public Game(String gameId, MyLatLng seedLoc) {
+    public Game(String gameId, MyLatLng seedLoc, ArrayList<PlayerClass> players) {
         this.gameId = gameId;
         //this.players = players;
         this.seedLoc = seedLoc;
+        this.players = players;
         //this.playersRemaining = playersRemaining;
     }
 
@@ -125,8 +137,12 @@ public class Game implements Parcelable {
     @Override
     public void writeToParcel(Parcel in, int i) {
         in.writeString(gameId);
-        //in.writeParcelable((Parcelable) players, i);
         in.writeTypedList(players);
+        //in.writeParcelable((Parcelable) players, i);
+        //xy.putParcelable("list", new ParcelableLinkedList<data>(storedData));
+        //pplayers = new ParcelableLinkedList<PlayerClass>(players);
+        //in.writeParcelable(new ParcelableLinkedList<PlayerClass>(players),i);
+        //in.writeTypedList(pplayers);
         in.writeParcelable((Parcelable) seedLoc, i);
         in.writeInt(playersRemaining);
         in.writeInt(durationSeconds);

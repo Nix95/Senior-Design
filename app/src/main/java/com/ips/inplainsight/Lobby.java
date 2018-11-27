@@ -16,7 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 public class Lobby extends AppCompatActivity {
@@ -41,10 +43,10 @@ public class Lobby extends AppCompatActivity {
 
 
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
-
-//        Game game1 = new Game("1", new MyLatLng(29.663350, -82.378250)); //construct initial game
-//        Game game2 = new Game("2", new MyLatLng(29.663350, -82.378250)); //construct initial game
-//        Game game3 = new Game("3", new MyLatLng(29.663350, -82.378250)); //construct initial game
+//        ArrayList<PlayerClass> players = new ArrayList<>();
+//        Game game1 = new Game("1", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+//        Game game2 = new Game("2", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+//        Game game3 = new Game("3", new MyLatLng(29.663350, -82.378250), players); //construct initial game
 //        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
 //        //game1.addPlayer(p); // add dummy player to game1
 //        mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -84,7 +86,7 @@ public class Lobby extends AppCompatActivity {
                 for(DataSnapshot dsp : dataSnapshot.getChildren()){
                     Log.d(TAG, "value being added"+String.valueOf(dsp.getKey()));
                     // add gameId to ArrayList
-                    Log.d(TAG, "ERROR: " + dsp.getValue(Game.class));
+                    //Log.d(TAG, "ERROR: " + dsp.getValue(Game.class));
                     values.add(String.valueOf(dsp.child("gameId").getValue(String.class))); //add result into array list
                     gameList.add(dsp.getValue(Game.class));
                 }

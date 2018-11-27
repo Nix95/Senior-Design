@@ -10,15 +10,15 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 public class PlayerClass implements Parcelable {
-    public static String uID;
-    public static String userName;
+    public static String uID = "";
+    public static String userName = "";
     public long reactTime =  5000;
     private boolean canAD = true;
     private PlayerClass target;
     private PlayerClass assassin;
-    private LatLng curLoc; //TODO update "my location" in game
-    private boolean inInnerBounds;
-    private boolean inOuterBounds;
+    private MyLatLng curLoc; //TODO update "my location" in game
+    private boolean inInnerBounds = true;
+    private boolean inOuterBounds = true;
     //Power-Ups
 
     public PlayerClass() {
@@ -40,7 +40,7 @@ public class PlayerClass implements Parcelable {
         canAD = in.readByte() != 0;
         target = in.readParcelable(PlayerClass.class.getClassLoader());
         assassin = in.readParcelable(PlayerClass.class.getClassLoader());
-        curLoc = in.readParcelable(LatLng.class.getClassLoader());
+        curLoc = in.readParcelable(MyLatLng.class.getClassLoader());
         inInnerBounds = in.readByte() != 0;
         inOuterBounds = in.readByte() != 0;
     }
@@ -88,11 +88,11 @@ public class PlayerClass implements Parcelable {
     public void setAssassin(PlayerClass assassin) {
         this.assassin = assassin;
     }
-    public LatLng getCurLoc() {
+    public MyLatLng getCurLoc() {
         return curLoc;
     }
 
-    public void setCurLoc(LatLng curLoc) {
+    public void setCurLoc(MyLatLng curLoc) {
         this.curLoc = curLoc;
     }
 
