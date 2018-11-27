@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -156,8 +157,29 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
         database = FirebaseDatabase.getInstance();
         mRef = database.getReference("games").child("game1");
+        mRef.keepSynced(true);
         //Log.d(TAG, "FB test: " + mRef.getKey());
-        //mRef.setValue(curGame);
+        //mRef.setValue(curGame.getPlayers());
+
+        Map<String, Object> postValues = new HashMap<String,Object>();
+        //postValues.put("players",curGame.getPlayers());
+        postValues.put("playersRemaining", curGame.getPlayersRemaining());
+        mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // Write was successful!
+                Log.d(TAG, "update children worked");
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Write failed
+                        Log.d(TAG, "SHE BROKE");
+                    }
+                });
+
+        //mRef.updateChildren("players", curGame.getPlayers());
         //String child = ;
         //mRef = mRef.child("");
         //mDatabase = FirebaseDatabase.getInstance().getReference();
