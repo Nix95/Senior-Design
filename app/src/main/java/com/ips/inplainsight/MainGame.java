@@ -32,8 +32,14 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -47,6 +53,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener,
@@ -101,12 +110,17 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     Handler h = new Handler();
-    int delay = 3000; //milliseconds
+    int delay = 180000; //milliseconds
     Runnable runnable;
     TextView mTextView;
     TextView llTextView;
 
     Intent lobby;
+
+    Handler h2 = new Handler();
+
+    FirebaseDatabase database;
+    DatabaseReference mRef;
 
     //@Override
     //public void onPause() {
@@ -139,13 +153,39 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
-        Log.d(TAG, "Current Player is: " + curPlayer.uID);
-        curGame.addPlayer(asPlayer);
+        Log.d(TAG, "Players remaining: " + curGame.getPlayersRemaining() + " " + curGame.gameId);
+        //curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
-        curGame.addPlayer(targetPlayer);
+        //curGame.addPlayer(targetPlayer);
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
-        //FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //DatabaseReference mRef = database.getReference("dummy");
+        database = FirebaseDatabase.getInstance();
+        mRef = database.getReference("games").child("game1");
+//        //Log.d(TAG, "FB test: " + mRef.getKey());
+//        //mRef.setValue(curGame.getPlayers());
+//        mRef.setValue(curGame.getPlayers());
+//        Map<String, Object> postValues = new HashMap<String,Object>();
+//        postValues.put("players",curGame.getPlayers());
+//        postValues.put("playersRemaining", curGame.getPlayersRemaining());
+//        //postValues.put("target", curPlayer.getTarget());
+//        //postValues.put("assassin", curPlayer.getAssassin());
+//        mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+//                // Write was successful!
+//                Log.d(TAG, "update children worked");
+//            }
+//        })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Write failed
+//                        Log.d(TAG, "SHE BROKE");
+//                    }
+//                });
+
+        //mRef.updateChildren("players", curGame.getPlayers());
+        //String child = ;
+        //mRef = mRef.child("");
         //mDatabase = FirebaseDatabase.getInstance().getReference();
         mLocationCallback = new LocationCallback() {
             @Override
@@ -155,13 +195,34 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 }
                 for(Location location : locationResult.getLocations()){
                     //Update UI
-                    curPlayer.setCurLoc(new LatLng(location.getLatitude(), location.getLongitude()));
+                    curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
+                    Map<String, Object> postValues = new HashMap<String,Object>();
+                    postValues.put("players",curGame.getPlayers());
+                    //postValues.put("target", curPlayer.getTarget());
+                    //postValues.put("assassin", curPlayer.getAssassin());
+                    //postValues.put("inInnerBounds", curPlayer.isInInnerBounds());
+                    //postValues.put("inOuterBounds",curPlayer.isInOuterBounds());
+                    mRef.updateChildren(postValues);
+
+                    mRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dsp) {
+                            curGame.setPlayers((ArrayList<PlayerClass>)dsp.child("players").getValue());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
                     llTextView.setText("   lat:   " + latitude + "\n   long:   " + longitude);
 
                     //in bounds
                     if(curGame.getPlayersRemaining()>1) {
+                        Log.d(TAG, "players remaining at start: " + curGame.getPlayersRemaining());
                         if (distance(location.getLatitude(), circleOuter.getCenter().latitude, location.getLongitude(), circleOuter.getCenter().longitude) > circleOuter.getRadius()) {
                             //player out of outer bounds, DQ
                             llTextView.setTextColor(Color.parseColor("#ff0000"));
@@ -231,6 +292,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 intentChange = data.getIntExtra("toRun", 0);
                 Log.d(TAG, diff + " : diff time");
                 curPlayer.reactTime = diff;
+
+                Map<String, Object> postValues = new HashMap<String,Object>();
+                postValues.put("players",curGame.getPlayers());
+                mRef.updateChildren(postValues);
+
                 h.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -278,6 +344,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                 }
                             }
                         }
+                        Map<String, Object> postValues = new HashMap<String,Object>();
+                        postValues.put("players",curGame.getPlayers());
+                        mRef.updateChildren(postValues);
                     }
                 }, d); //ensures the other time is gotten or default lose after 5 second. Maybe have this be the refresh
 
@@ -289,7 +358,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-
+            Log.d(TAG, "onlocationchange");
         }
     }
 
@@ -301,7 +370,16 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(mySensorEventListener, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
-        h.postDelayed( runnable = new Runnable() {
+//        h2.postDelayed(runnable = new Runnable() {
+//            public void run() {
+//                Map<String, Object> postValues = new HashMap<String,Object>();
+//                postValues.put("players",curGame.getPlayers());
+//                mRef.updateChildren(postValues);
+//                h2.postDelayed(runnable, 1000);
+//            }
+//        }, 1000);
+
+        h.postDelayed(runnable = new Runnable() {
             public void run() {
                 double shrink = 0.7;
                 double shrinkInv = 1 - shrink;
@@ -386,8 +464,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
 
-        targetPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
-        asPlayer.setCurLoc(new LatLng(29.6633, -82.3782));
+        targetPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
+        asPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
     }
 
     /**

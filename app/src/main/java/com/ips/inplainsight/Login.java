@@ -154,10 +154,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            PlayerClass player = new PlayerClass(getString(R.string.firebase_status_fmt, user.getUid()));
-                            lobby.putExtra("User", player);
+//                            PlayerClass player = new PlayerClass(getString(R.string.firebase_status_fmt, user.getUid()));
+//                            lobby.putExtra("User", player);
                             updateUI(user);
-                            startActivity(lobby);
+//                            startActivity(lobby);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -244,7 +244,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 //            startActivity(new Intent(Login.this, Lobby.class));
             findViewById(R.id.disconnect_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-
+            PlayerClass player = new PlayerClass(getString(R.string.firebase_status_fmt, user.getUid()));
+            lobby.putExtra("User", player);
+            startActivity(lobby);
         } else {
             mStatusTextView.setText(null);
             mDetailTextView.setText(null);

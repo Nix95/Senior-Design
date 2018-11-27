@@ -16,7 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 public class Lobby extends AppCompatActivity {
@@ -39,20 +41,20 @@ public class Lobby extends AppCompatActivity {
         player = (PlayerClass)getIntent().getParcelableExtra("User");
         currGame = new Intent(this, MainGame.class);
 
-        /************************************
+
         // The below lines are commented out. They are only needed to add Game objects to the firebase database
+        //ArrayList<PlayerClass> players = new ArrayList<>();
+        //Game game1 = new Game("1", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+//        Game game2 = new Game("2", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+//        Game game3 = new Game("3", new MyLatLng(29.663350, -82.378250), players); //construct initial game
+//        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
+//        //game1.addPlayer(p); // add dummy player to game1
+       //mDatabase = FirebaseDatabase.getInstance().getReference();
+       //mDatabase.child("games").child("game1").setValue(game1);
+//        mDatabase.child("games").child("game2").setValue(game2);
+//        mDatabase.child("games").child("game3").setValue(game3);
 
-        Game game1 = new Game("1", new LatLng(29.663350, -82.378250)); //construct initial game
-        Game game2 = new Game("2", new LatLng(29.663350, -82.378250)); //construct initial game
-        Game game3 = new Game("3", new LatLng(29.663350, -82.378250)); //construct initial game
-        //PlayerClass p = new PlayerClass("bob"); // construct dummy player
-        //game1.addPlayer(p); // add dummy player to game1
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("games").push().setValue(game1);
-        mDatabase.child("games").push().setValue(game2);
-        mDatabase.child("games").push().setValue(game3);
 
-        *************************************/
 
         mGameList = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
@@ -71,7 +73,7 @@ public class Lobby extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference mRef = database.getReference("games");
 
-        mRef.addValueEventListener(new ValueEventListener() {
+        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //Log.d(TAG, "inside of onDataChange called.");
@@ -84,6 +86,7 @@ public class Lobby extends AppCompatActivity {
                 for(DataSnapshot dsp : dataSnapshot.getChildren()){
                     Log.d(TAG, "value being added"+String.valueOf(dsp.getKey()));
                     // add gameId to ArrayList
+                    //Log.d(TAG, "ERROR: " + dsp.getValue(Game.class));
                     values.add(String.valueOf(dsp.child("gameId").getValue(String.class))); //add result into array list
                     gameList.add(dsp.getValue(Game.class));
                 }
@@ -92,7 +95,8 @@ public class Lobby extends AppCompatActivity {
 
                 Game gts = new Game();
                 //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
-                gts = gameList.get(0);
+                //TODO user selected
+               gts = gameList.get(0);
                 Log.d(TAG, "game to pass "+gts.gameId);
 
                 //Bundle extras = new Bundle();
