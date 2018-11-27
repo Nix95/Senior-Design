@@ -162,7 +162,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         //mRef.setValue(curGame.getPlayers());
 
         Map<String, Object> postValues = new HashMap<String,Object>();
-        //postValues.put("players",curGame.getPlayers());
+        postValues.put("players",curGame.getPlayers());
         postValues.put("playersRemaining", curGame.getPlayersRemaining());
         mRef.updateChildren(postValues).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
