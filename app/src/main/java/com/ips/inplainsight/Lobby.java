@@ -95,7 +95,8 @@ public class Lobby extends AppCompatActivity {
                 Game gts = new Game();
                 //gts = dataSnapshot.child("games/-LR3tyvnY6U3bcNB5byG").getValue(Game.class);
                 //TODO user selected
-               gts = gameList.get(0);
+
+                gts = gameList.get(0);
                 Log.d(TAG, "game to pass "+gts.gameId);
 
                 //Bundle extras = new Bundle();

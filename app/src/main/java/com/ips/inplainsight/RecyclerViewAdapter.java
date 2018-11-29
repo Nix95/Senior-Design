@@ -16,12 +16,13 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static final String TAG = "RecyclerViewAdapter";
 
-    private ArrayList<String> gameNames;
+    private ArrayList<String> gameNames = new ArrayList<>();
     //private ArrayList<String> mImages = new ArrayList<>();
-    //private Context mContext;
+    private Context mContext;
 
-    public RecyclerViewAdapter(ArrayList<String> gameNames) {
+    public RecyclerViewAdapter(ArrayList<String> gameNames, Context mContext) {
         this.gameNames = gameNames;
+        this.mContext = mContext;
     }
 
     @Override
@@ -36,15 +37,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "onBindViewHolder: called.");
         holder.gameName.setText(gameNames.get(position));
 
-        /* onClickListener for message, probably dont need this
+        //onClickListener
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view, int position) {
                 Log.d(TAG, "onClick: clicked on: " + gameNames.get(position));
 
                 Toast.makeText(mContext, gameNames.get(position), Toast.LENGTH_SHORT).show();
+                //Intent intent = new Intent(mContext, GalleryActivity.class);
+                //intent.putExtra("image_url", mImages.get(position));
+                //intent.putExtra("image_name", mImageNames.get(position));
+                //mContext.startActivity(intent);
                 }
-        });*/
+        });
     }
 
     @Override
@@ -53,8 +58,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
+
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView gameName;
+        public TextView gameName;
         RelativeLayout parentLayout;
 
         public ViewHolder(View itemView) {
@@ -65,4 +71,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
+
 }
+
