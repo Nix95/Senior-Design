@@ -156,6 +156,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         Log.d(TAG, "Players remaining: " + curGame.getPlayersRemaining() + " " + curGame.gameId);
         //curGame.addPlayer(asPlayer);
         curGame.addPlayer(curPlayer);
+        curGame.setPlayersRemaining(curGame.getPlayersRemaining());
         //curGame.addPlayer(targetPlayer);
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
         database = FirebaseDatabase.getInstance();
@@ -196,18 +197,13 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 for(Location location : locationResult.getLocations()){
                     //Update UI
                     curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
-                    Map<String, Object> postValues = new HashMap<String,Object>();
-                    postValues.put("players",curGame.getPlayers());
-                    //postValues.put("target", curPlayer.getTarget());
-                    //postValues.put("assassin", curPlayer.getAssassin());
-                    //postValues.put("inInnerBounds", curPlayer.isInInnerBounds());
-                    //postValues.put("inOuterBounds",curPlayer.isInOuterBounds());
-                    mRef.updateChildren(postValues);
 
                     mRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dsp) {
                             curGame.setPlayers((ArrayList<PlayerClass>)dsp.child("players").getValue());
+                            curGame.setPlayersRemaining(curGame.getPlayers().size());
+                            Log.d(TAG, "players remaining FB update: " + curGame.getPlayers().size());
                         }
 
                         @Override
@@ -215,6 +211,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
                         }
                     });
+
+                    //Map<String, Object> postValues = new HashMap<String,Object>();
+                    //postValues.put("curLoc",curPlayer.getCurLoc());
+                    mRef.child("players").child("1").setValue(curPlayer);
 
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
@@ -313,6 +313,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                         startActivity(lobby);
                                     }
                                     curGame.eliminatePlayer(curPlayer.getTarget());
+
+                                    Map<String, Object> postValues = new HashMap<String,Object>();
+                                    postValues.put("players",curGame.getPlayers());
+                                    mRef.updateChildren(postValues);
+
                                     Toast.makeText(getApplication().getApplicationContext(), "Target eliminated!", Toast.LENGTH_LONG).show();
                                 } else {
                                     Toast.makeText(getApplication().getApplicationContext(), "Target escaped!\nWait two minutes to attack.", Toast.LENGTH_LONG).show();
@@ -341,6 +346,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                     }
                                     Toast.makeText(getApplication().getApplicationContext(), "You were eliminated!", Toast.LENGTH_LONG).show();
                                     curGame.eliminatePlayer(curPlayer);
+
+                                    Map<String, Object> postValues = new HashMap<String,Object>();
+                                    postValues.put("players",curGame.getPlayers());
+                                    mRef.updateChildren(postValues);
                                 }
                             }
                         }
@@ -447,6 +456,10 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
+
+        Map<String, Object> postValues = new HashMap<String,Object>();
+        postValues.put("players",curGame.getPlayers());
+        mRef.updateChildren(postValues);
 
         curGame.setSeedLoc(new MyLatLng(29.663350, -82.378250));
         LatLng temp = new LatLng(curGame.getSeedLoc().latitude, curGame.getSeedLoc().longitude);
