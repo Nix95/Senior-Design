@@ -68,11 +68,11 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     int intentChange = 0;
 
     //temp objects
-    PlayerClass curPlayer;
+    PlayerClass curPlayer = new PlayerClass();
     PlayerClass targetPlayer = new PlayerClass();
     PlayerClass asPlayer = new PlayerClass();
 
-    Game curGame;
+    Game curGame = new Game();
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -110,7 +110,7 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     Handler h = new Handler();
-    int delay = 180000; //milliseconds
+    int delay = 120000; //milliseconds
     Runnable runnable;
     TextView mTextView;
     TextView llTextView;
@@ -145,22 +145,26 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         lobby = new Intent(this, Lobby.class);
 
         //temp objects
-        curPlayer = (PlayerClass)getIntent().getExtras().getParcelable("currPlayer");
-        curGame = (Game)getIntent().getExtras().getParcelable("gts");
-
-        Log.d(TAG, "got the game: "+curGame.gameId);
+        //curPlayer = (PlayerClass)getIntent().getExtras().getParcelable("currPlayer");
+        //curGame = (Game)getIntent().getExtras().getParcelable("gts");
+        //curGame = new Game();
+        //Log.d(TAG, "got the game: "+curGame.gameId);
 
         asPlayer.userName = "asPlayer";
         curPlayer.userName = "curPlayer";
         targetPlayer.userName = "targetPlayer";
-        Log.d(TAG, "Players remaining: " + curGame.getPlayersRemaining() + " " + curGame.gameId);
-        //curGame.addPlayer(asPlayer);
-        curGame.addPlayer(curPlayer);
-        curGame.setPlayersRemaining(curGame.getPlayersRemaining());
-        //curGame.addPlayer(targetPlayer);
+        //Log.d(TAG, "Players remaining: " + curGame.getPlayersRemaining() + " " + curGame.gameId);
+        int ctrl = 0;
+        if(ctrl==0) {
+            curGame.addPlayer(asPlayer);
+            curGame.addPlayer(curPlayer);
+            //curGame.setPlayersRemaining(curGame.getPlayersRemaining());
+            curGame.addPlayer(targetPlayer);
+            ctrl =1;
+        }
         //Log.d(TAG, "Target: " + targetPlayer.getTarget());
-        database = FirebaseDatabase.getInstance();
-        mRef = database.getReference("games").child("game1");
+        //database = FirebaseDatabase.getInstance();
+        //mRef = database.getReference("games").child("game1");
 //        //Log.d(TAG, "FB test: " + mRef.getKey());
 //        //mRef.setValue(curGame.getPlayers());
 //        mRef.setValue(curGame.getPlayers());
@@ -197,24 +201,24 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 for(Location location : locationResult.getLocations()){
                     //Update UI
                     curPlayer.setCurLoc(new MyLatLng(location.getLatitude(), location.getLongitude()));
-
-                    mRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dsp) {
-                            curGame.setPlayers((ArrayList<PlayerClass>)dsp.child("players").getValue());
-                            curGame.setPlayersRemaining(curGame.getPlayers().size());
-                            Log.d(TAG, "players remaining FB update: " + curGame.getPlayers().size());
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+//
+//                    mRef.addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dsp) {
+//                            curGame.setPlayers((ArrayList<PlayerClass>)dsp.child("players").getValue());
+//                            curGame.setPlayersRemaining(curGame.getPlayers().size());
+//                            Log.d(TAG, "players remaining FB update: " + curGame.getPlayers().size());
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {
+//
+//                        }
+//                    });
 
                     //Map<String, Object> postValues = new HashMap<String,Object>();
                     //postValues.put("curLoc",curPlayer.getCurLoc());
-                    mRef.child("players").child("1").setValue(curPlayer);
+                    //mRef.child("players").child("1").setValue(curPlayer);
 
                     double longitude = location.getLongitude();
                     double latitude = location.getLatitude();
@@ -236,28 +240,29 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
 
                         //Dummy player hot cold TODO add assassin
                         //TextView mTextView = findViewById(R.id.DirectionTextView);
-                        if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 50) {
+                        if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 100) {
                             //player out of outer bounds, DQ
                             mTextView.setTextColor(Color.parseColor("#0000ff"));
-                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 49 &&
-                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 25) {
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 89 &&
+                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 55) {
                             //Player out of inner bounds, gets damage
                             mTextView.setTextColor(Color.parseColor("#ffa500"));
-                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 24 &&
-                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 5) {
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) < 54 &&
+                                distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) > 15) {
                             mTextView.setTextColor(Color.parseColor("#ff0000"));
-                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5 ||
-                                distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5) {
+                        } else if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 15 ||
+                                distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 15) {
                             //TODO go to mini game intent and handle elimination
 
-                            if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 5) {
+                            if (distance(location.getLatitude(), targetPlayer.getCurLoc().latitude, location.getLongitude(), targetPlayer.getCurLoc().longitude) <= 15) {
                                 AoD = 0;
-                            } else if (distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 5) {
+                            } else if (distance(location.getLatitude(), asPlayer.getCurLoc().latitude, location.getLongitude(), asPlayer.getCurLoc().longitude) <= 15) {
                                 AoD = 1;
                             }
                             intent = new Intent(MainGame.this, MiniGameActivity.class);
 
                             if (AoD == 0 && intentChange == 0) { //Atacking, elim other or refresh if lose
+                                intentChange = 1;
                                 if (curPlayer.getCanAD() && curPlayer.getTarget().getCanAD()) {
                                     //Log.d(TAG, intentChange + " : Swithcing intent");
                                     intentChange = 1;
@@ -293,9 +298,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 Log.d(TAG, diff + " : diff time");
                 curPlayer.reactTime = diff;
 
-                Map<String, Object> postValues = new HashMap<String,Object>();
-                postValues.put("players",curGame.getPlayers());
-                mRef.updateChildren(postValues);
+                //Map<String, Object> postValues = new HashMap<String,Object>();
+                //postValues.put("players",curGame.getPlayers());
+                //mRef.updateChildren(postValues);
 
                 h.postDelayed(new Runnable() {
                     @Override
@@ -305,18 +310,17 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                 if (diff < curPlayer.getTarget().reactTime) {
                                     Log.d(TAG, "Taking out target. Pr: " + curGame.getPlayersRemaining());
                                     curPlayer.reactTime = 5000; //reset your reaction time
-                                    Log.d(TAG, curGame.getPlayersRemaining() + " : Players remaining");
-                                    if(curGame.getPlayersRemaining()<=2){ //win/lose
+                                    if(curGame.getPlayersRemaining()<2){ //win/lose
                                         Toast.makeText(getApplication().getApplicationContext(), "YOU WON!", Toast.LENGTH_LONG).show();
                                         Log.d(TAG, "WIN");
                                         //TODO go to lobby
                                         startActivity(lobby);
                                     }
                                     curGame.eliminatePlayer(curPlayer.getTarget());
-
-                                    Map<String, Object> postValues = new HashMap<String,Object>();
-                                    postValues.put("players",curGame.getPlayers());
-                                    mRef.updateChildren(postValues);
+                                    Log.d(TAG, curGame.getPlayersRemaining() + " : Players remaining");
+                                    //Map<String, Object> postValues = new HashMap<String,Object>();
+                                    //postValues.put("players",curGame.getPlayers());
+                                    //mRef.updateChildren(postValues);
 
                                     Toast.makeText(getApplication().getApplicationContext(), "Target eliminated!", Toast.LENGTH_LONG).show();
                                 } else {
@@ -347,15 +351,15 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                                     Toast.makeText(getApplication().getApplicationContext(), "You were eliminated!", Toast.LENGTH_LONG).show();
                                     curGame.eliminatePlayer(curPlayer);
 
-                                    Map<String, Object> postValues = new HashMap<String,Object>();
-                                    postValues.put("players",curGame.getPlayers());
-                                    mRef.updateChildren(postValues);
+//                                    Map<String, Object> postValues = new HashMap<String,Object>();
+//                                    postValues.put("players",curGame.getPlayers());
+//                                    mRef.updateChildren(postValues);
                                 }
                             }
                         }
-                        Map<String, Object> postValues = new HashMap<String,Object>();
-                        postValues.put("players",curGame.getPlayers());
-                        mRef.updateChildren(postValues);
+//                        Map<String, Object> postValues = new HashMap<String,Object>();
+//                        postValues.put("players",curGame.getPlayers());
+//                        mRef.updateChildren(postValues);
                     }
                 }, d); //ensures the other time is gotten or default lose after 5 second. Maybe have this be the refresh
 
@@ -457,9 +461,9 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
         enableMyLocation();
 
-        Map<String, Object> postValues = new HashMap<String,Object>();
-        postValues.put("players",curGame.getPlayers());
-        mRef.updateChildren(postValues);
+//        Map<String, Object> postValues = new HashMap<String,Object>();
+//        postValues.put("players",curGame.getPlayers());
+//        mRef.updateChildren(postValues);
 
         curGame.setSeedLoc(new MyLatLng(29.663350, -82.378250));
         LatLng temp = new LatLng(curGame.getSeedLoc().latitude, curGame.getSeedLoc().longitude);
@@ -477,8 +481,8 @@ public class MainGame extends AppCompatActivity implements GoogleMap.OnMyLocatio
                 .strokeWidth(10)
                 .strokeColor(Color.BLUE));
 
-        targetPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
-        asPlayer.setCurLoc(new MyLatLng(29.6633, -82.3782));
+        targetPlayer.setCurLoc(new MyLatLng(29.663222, -82.3782)); //378355,
+        asPlayer.setCurLoc(new MyLatLng(33.66333, -85.37700));//29.66333, -82.37700
     }
 
     /**

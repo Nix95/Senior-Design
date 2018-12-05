@@ -70,7 +70,7 @@ public class Game implements Parcelable {
             players.get(0).setAssassin(player);
             players.add(playersRemaining, player); //adds to end of list
         }
-        playersRemaining = players.size();
+        playersRemaining++;
         //pplayers = new ParcelableLinkedList<PlayerClass>(players);
     }
 
@@ -100,7 +100,7 @@ public class Game implements Parcelable {
                 players.remove(player);
             }
         }
-        playersRemaining = players.size();
+        playersRemaining--;
         //pplayers = new ParcelableLinkedList<PlayerClass>(players);
     }
 

@@ -12,7 +12,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class PlayerClass implements Parcelable {
     public static String uID = "";
     public static String userName = "";
-    public long reactTime =  5000;
+    public long reactTime =  2000;
     private boolean canAD = true;
     private PlayerClass target;
     private PlayerClass assassin;
